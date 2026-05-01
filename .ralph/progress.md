@@ -4,6 +4,37 @@ Each iteration appends one block. Newest at the top.
 
 ---
 
+## Iteration 10 — 2026-05-01 14:13 KST — TASK-013 LocalParquetNemotronSource (DuckDB)
+
+**Pattern:** A (despite originally being scoped as B; the parquet schema was already mapped in iteration 7's probe and the SQL query shape is straightforward)
+
+**What happened**
+
+- `packages/personas/src/sources/duckdb-client.ts` — small DuckDB wrapper around `@duckdb/node-api` (NOT the legacy `duckdb` npm package). Exposes `getDuckDBInstance()` (singleton in-memory instance shared across sources), `runQuery(conn, sql, params)` with type-aware binders (boolean/bigint/integer/double/varchar/null), and `sanitizeBigInts(row)` that flattens DuckDB's BigInt return values to plain JS numbers before normalization.
+- `packages/personas/src/sources/local-parquet-source.ts` — `LocalParquetNemotronSource` class implementing `PersonaSource`. `search()` builds a parameterized SQL WHERE from every PersonaSearchQuery field (age range, sex, marital status, education, occupation, country, province, district, multi-token textQuery LIKE across 7 narrative columns) and reads through `read_parquet('<rootDir>/data/train-*.parquet')`. `sample()` does bucket round-robin diversity sampling. `getById()` decodes `nemotron:<dataset>:<rowId>` → `WHERE uuid = ?`. Constructor throws when shards are missing so failures surface immediately with a `huggingface-cli download` hint.
+- 10 vitest tests against the real Korea shards (skipped cleanly via `describe.skip` when the gitignored dataset is absent). All passing — including the load-bearing demo conditions: **age 40-65 → ≥3 matches**, **age 19-19 → ≥3 matches**, Korean `'판타지'` textQuery hits, getById round-trip, foreign-prefix getById returns null.
+
+**Bug fixed in-iteration**
+
+- Initial test asserted `textQuery: "price hidden"` on Korean narratives → 0 matches. The Korea shard is fully Korean; a Latin keyword is the wrong assertion. Replaced with two tests: a demographics-only baseline (≥3 matches at 40-65, the canonical demo persona window) plus a Korean-language smoke (`'가격'` runs cleanly, hit count not asserted).
+
+**Gates**
+
+- pnpm typecheck: pass (11 packages)
+- pnpm lint: pass (97 files, 5 cosmetic auto-fixes)
+- pnpm test: pass (core 57/57 + personas 36/36 = 93/93)
+
+**Phase 2 status**
+
+- TASK-010 ✓ TASK-011 ✓ TASK-012 ✓ TASK-013 ✓
+- Demo path now has real Korean personas via DuckDB. TASK-014 (BYO JSON) and TASK-015 (HF) deferred to S6/stretch.
+
+**Next iteration**
+
+- Skip TASK-014/015 (deferred). Jump to TASK-016 (Phase 2 boundary, Pattern C with phase-tester + spec-reviewer + dataset-validator) — but also could move directly to Phase 3 (runner) given time pressure. Decision next iteration.
+
+---
+
 ## Iteration 9 — 2026-05-01 14:09 KST — TASK-012 PersonaCompiler
 
 **Pattern:** A

@@ -2,7 +2,7 @@
   "id": "TASK-015",
   "phase": "P2",
   "title": "HuggingFaceNemotronSource (Python helper, deferred)",
-  "status": "pending",
+  "status": "skipped",
   "pattern": "A",
   "acceptance": [
     "packages/personas/python/hf_sample_personas.py streams from the HF API and emits NDJSON matching PersonaRecord",
@@ -15,6 +15,8 @@
     "packages/personas/src/sources/huggingface-source.ts",
     "packages/personas/src/__tests__/huggingface-source.test.ts"
   ],
-  "depends": ["TASK-011"],
+  "depends": [
+    "TASK-011"
+  ],
   "deferIf": "Time budget tight — LocalParquet covers offline path; HF is the network fallback."
 }

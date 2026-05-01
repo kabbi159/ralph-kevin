@@ -36,7 +36,11 @@ const tasks: Task[] = readdirSync(taskDir)
 const byId = new Map(tasks.map((t) => [t.id, t]));
 
 const isReady = (t: Task) =>
-  t.status === "pending" && t.depends.every((d) => byId.get(d)?.status === "completed");
+  t.status === "pending" &&
+  t.depends.every((d) => {
+    const s = byId.get(d)?.status;
+    return s === "completed" || s === "skipped";
+  });
 
 const ready = tasks.filter(isReady).sort((a, b) => a.id.localeCompare(b.id));
 

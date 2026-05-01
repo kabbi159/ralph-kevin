@@ -2,7 +2,7 @@
   "id": "TASK-013",
   "phase": "P2",
   "title": "LocalParquetNemotronSource — DuckDB-backed source over data/personas/nemotron-korea/data/train-*.parquet",
-  "status": "pending",
+  "status": "completed",
   "pattern": "B",
   "acceptance": [
     "packages/personas/src/sources/local-parquet-source.ts uses @duckdb/node-api 1.5.2-r.1 (NOT the legacy `duckdb` package)",
@@ -18,5 +18,7 @@
     "packages/personas/src/sources/duckdb-client.ts",
     "packages/personas/src/__tests__/local-parquet-source.test.ts"
   ],
-  "depends": ["TASK-011"]
+  "depends": [
+    "TASK-011"
+  ]
 }

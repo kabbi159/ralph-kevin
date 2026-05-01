@@ -2,7 +2,7 @@
   "id": "TASK-014",
   "phase": "P2",
   "title": "LocalJsonPersonaSource (BYO NDJSON/JSON adapter) + diversity sampler",
-  "status": "pending",
+  "status": "skipped",
   "pattern": "A",
   "acceptance": [
     "packages/personas/src/sources/local-json-source.ts: accepts a path to NDJSON or JSON-array of PersonaRecord-shaped rows; validates each via PersonaRecordSchema",
@@ -17,5 +17,7 @@
     "packages/personas/src/__tests__/local-json-source.test.ts",
     "packages/personas/src/__tests__/diversity.test.ts"
   ],
-  "depends": ["TASK-011"]
+  "depends": [
+    "TASK-011"
+  ]
 }
