@@ -1,5 +1,5 @@
 {
-  "targetUrl": "http://localhost:3000/checkout",
+  "targetUrl": "http://localhost:3100/checkout",
   "task": "Complete checkout up to the final payment confirmation. Do not make a real purchase.",
   "successCriteria": [
     "The persona can find the final total.",

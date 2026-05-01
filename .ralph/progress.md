@@ -4,6 +4,35 @@ Each iteration appends one block. Newest at the top.
 
 ---
 
+## Iteration 3 — 2026-05-01 13:51 KST — TASK-003 RunConfig + RunEvent + Artifact schemas
+
+**Pattern:** A
+
+**What happened**
+
+- `packages/core/src/schemas/run-config.ts` — `ViewportSchema`, `RunLimitsSchema`, `RunSafetySchema`, `RunArtifactsToggleSchema`, `RunConfigSchema` (with `personaQuery: PersonaSearchQuerySchema.optional()` per spec-changes), `RunStatusSchema`, `RunSchema`. `id` is optional on RunConfig (the CLI assigns it on hydrate).
+- `packages/core/src/schemas/run-event.ts` — `BoundingBoxSchema`, `InteractiveElementSchema`, `ObservationSchema`, `RunEventResultSchema`, `RunEventSchema`. `action` is the cross-package `AgentActionSchema`.
+- `packages/core/src/schemas/artifact.ts` — `ArtifactTypeSchema` (screenshot/trace/video/rrweb/report/compare/fix_prompt/interview), `ArtifactSchema` with relative `path`, `contentType`, `sizeBytes`, `metadata`.
+- 11 new tests + 20 existing → **31/31 green**. The two example JSONs (`examples/run-config.checkout.json`, `examples/run-config.crack.json`) both validate.
+
+**Spec-changes committed**
+
+- docs/04 §Run config: `personaQuery: string` → `personaQuery: PersonaSearchQuery`. The string form was a typo — every actual usage is a structured query.
+- examples/run-config.checkout.json: `targetUrl` port `3000` → `3100` to match the `examples/ecommerce-checkout` Next.js port.
+- Both logged in `.ralph/spec-changes.md`.
+
+**Gates**
+
+- pnpm typecheck: pass (11 packages)
+- pnpm lint: pass (70 files, 3 cosmetic auto-fixes)
+- pnpm test: pass (core 31/31)
+
+**Next iteration**
+
+- TASK-004: FrictionSignal + UXFinding + Interview Zod schemas.
+
+---
+
 ## Iteration 2 — 2026-05-01 13:48 KST — TASK-002 PersonaUXProfile + AgentAction schemas
 
 **Pattern:** A

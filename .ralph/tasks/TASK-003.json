@@ -2,7 +2,7 @@
   "id": "TASK-003",
   "phase": "P1",
   "title": "RunConfig + RunEvent + Artifact Zod schemas",
-  "status": "pending",
+  "status": "completed",
   "pattern": "A",
   "acceptance": [
     "RunConfigSchema matches docs/04 §Run config (id, targetUrl, task, personaQuery|personaIds|personaPackId, viewport, limits, safety, artifacts)",
@@ -17,5 +17,7 @@
     "packages/core/src/schemas/artifact.ts",
     "packages/core/src/__tests__/run-config.test.ts"
   ],
-  "depends": ["TASK-002"]
+  "depends": [
+    "TASK-002"
+  ]
 }

@@ -14,7 +14,5 @@
     "packages/core/src/schemas/agent-action.ts",
     "packages/core/src/__tests__/agent-action.test.ts"
   ],
-  "depends": [
-    "TASK-001"
-  ]
+  "depends": ["TASK-001"]
 }

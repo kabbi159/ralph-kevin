@@ -52,7 +52,7 @@ export type RunConfig = {
   successCriteria?: string[];
 
   personaSource?: string;
-  personaQuery?: string;
+  personaQuery?: PersonaSearchQuery;
   personaIds?: string[];
   personaPackId?: string;
   sampleSize?: number;
