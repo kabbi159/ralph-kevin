@@ -16,7 +16,5 @@
     "packages/analyzer/src/findings/fix-prompt.ts",
     "packages/analyzer/src/__tests__/findings.test.ts"
   ],
-  "depends": [
-    "TASK-040"
-  ]
+  "depends": ["TASK-040"]
 }

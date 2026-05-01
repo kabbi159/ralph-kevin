@@ -14,7 +14,5 @@
     "packages/analyzer/src/interview/generate.ts",
     "packages/analyzer/src/__tests__/interview.test.ts"
   ],
-  "depends": [
-    "TASK-041"
-  ]
+  "depends": ["TASK-041"]
 }

@@ -1,19 +1,19 @@
 {
-  "iteration": 16,
+  "iteration": 17,
   "currentPhase": "P3",
   "currentTaskId": "TASK-024",
-  "currentTaskStatus": "pending",
+  "currentTaskStatus": "completed",
   "lastUpdatedAt": "2026-05-01T05:35:03.562Z",
   "timeBudgetSignal": "active",
   "branch": "develop",
   "lastCommitSha": "11d9af41577f36ebd973469b805a3248a9109340",
   "lastPushAt": "2026-05-01T13:44:16+0900",
-  "handoffNote": "P5 (Analyzer) closed via combined commit. Next: P6 CLI.",
+  "handoffNote": "Demo path closed: G1 green (10 signals + 3 high), G2 green (post-fix → 7 resolved), G3 green (≤1s end-to-end). G4 (clone-and-install distribution) deferred — packages/cli has the bin entry but pnpm link --global setup is stretch S7.",
   "gates": {
-    "G1": "pending",
-    "G2": "pending",
-    "G3": "pending",
-    "G4": "pending"
+    "G1": "green",
+    "G2": "green",
+    "G3": "green",
+    "G4": "deferred"
   },
   "stretchQueueProgress": {
     "current": null,

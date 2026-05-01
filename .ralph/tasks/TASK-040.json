@@ -15,7 +15,5 @@
     "packages/analyzer/src/friction/detectors.ts",
     "packages/analyzer/src/__tests__/friction.test.ts"
   ],
-  "depends": [
-    "TASK-025"
-  ]
+  "depends": ["TASK-025"]
 }
