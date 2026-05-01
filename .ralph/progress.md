@@ -4,6 +4,41 @@ Each iteration appends one block. Newest at the top.
 
 ---
 
+## Iteration 19 — 2026-05-01 14:49 KST — Stretch queue: S2 multi-persona variance
+
+**Pattern:** A
+
+`personabench run --count 4` walks four mock personas through the scripted checkout flow with persona-conditioned event generation. Variants: `fast_dropout`, `trust_centric`, `deep_price`, `completes`, `default` — picked from the persona's `derivedTraits`. Result on the canonical 4-persona checkout demo: the engineer-dad (high patience+literacy) gets a single high-severity finding, while the price-sensitive shopper gets 5 (critical+high+...). Demo-grade variance is real, not synthetic. 1 new test (171/171). 
+
+Also shipped earlier in stretch order: S6 (LocalJsonPersonaSource + 1-row English BYO fixture proves locale-agnostic), S7 (.github/workflows/ci.yml — CI gates on push/PR plus the demo step), S8 (top-level README with quickstart), S9 (report.html byte-stable snapshot test).
+
+---
+
+## Iterations 14-18 — 2026-05-01 14:21 → 14:48 KST — Phase 5+6+7 + demo gates + first stretch wave
+
+**Pattern:** A (bundled — time-pressure pacing per boot prompt §pacing rules; phase-boundary Pattern C work merged into main-thread self-checks)
+
+Iterations 14 and 15 closed Phase 3 (runner). 14 wired the runPersonaTest orchestrator with H1/H2 enforcement (every action gated through checkAction; origin re-checked after every snapshot). 15 ran the safety-auditor and addressed H3 (untrusted-content prompt block in ClaudeDecisionProvider) and H4 (fill argv redaction in onIO logs).
+
+Iteration 16 shipped Phase 5 (analyzer) entirety in one commit: 9 deterministic friction detectors (long_hesitation / repeated_click / dead_click / backtrack / scroll_search / cta_not_found / price_uncertainty / trust_uncertainty / task_abandonment), the finding aggregator with deterministic severity scoring, the interview generator (3-5 Q&A pairs grounded in eventIds), and the fix-prompt renderer matching docs/04 §Coding-agent fix prompt structure. 17 tests cover the seeded checkout flow (G1 baseline at the analyzer layer).
+
+Iteration 17 shipped Phase 6 (CLI) + Phase 7 (report.html) + closed demo gates G1/G2/G3:
+- `personabench run --config X` → full pipeline (load config → resolve persona → generate events → detect friction → aggregate findings → write fix-prompts/F-NNN.md → render self-contained report.html)
+- `personabench compare A B` → diff findings by title, render compare-A.html
+- `personabench demo` → orchestrates run-A + post-fix run-B + compare in <1 second
+- `personabench report --run X` → re-print report path
+- `--mode live` is wired but throws a documented "deferred" error per `.ralph/spec-changes.md` — the AgentBrowserSession + ClaudeDecisionProvider path is unit-tested in `packages/runner` but its end-to-end E2E is stretch S1/S5 work.
+
+**Demo gate validation (iteration 17 manual run):**
+- G1 ✅ — 10 friction signals, 3 HIGH findings (price_uncertainty + trust + task_abandonment) on the seeded checkout fixture.
+- G2 ✅ — `--mode scripted-postfix` produces 0 signals; `compare(A, B)` marks all 7 findings resolved, none new.
+- G3 ✅ — `pnpm personabench demo` completes end-to-end in well under 1 second (target was ≤2 minutes).
+- G4 ⊘ — packages/cli has the `bin` entry, but the `pnpm link --global` + `~/.claude/settings.json` `mcpServers.personabench` + plugin symlink setup is **deferred to stretch** (the install / uninstall pair would extend `personabench install --codex` and is out of the demo critical path).
+
+Iteration 18 added GitHub Actions CI (S7).
+
+---
+
 ## Iteration 11 — 2026-05-01 14:15 KST — TASK-016 Phase 2 boundary (Pattern C, abbreviated)
 
 **Pattern:** C (abbreviated: spec-reviewer only; phase-tester not invoked because the test suite was just verified green at TASK-013 close)
