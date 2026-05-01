@@ -16,7 +16,5 @@
     "packages/core/src/schemas/interview.ts",
     "packages/core/src/__tests__/ux-finding.test.ts"
   ],
-  "depends": [
-    "TASK-003"
-  ]
+  "depends": ["TASK-003"]
 }

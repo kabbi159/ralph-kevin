@@ -4,6 +4,29 @@ Each iteration appends one block. Newest at the top.
 
 ---
 
+## Iteration 5 — 2026-05-01 13:55 KST — TASK-005 ID generators + ISO-8601 time helpers
+
+**Pattern:** A
+
+**What happened**
+
+- `packages/core/src/ids.ts` — `newRunId / newEventId / newSignalId / newArtifactId / newInterviewId`, all built from `Date.now()` base36 (sortable 9-char prefix) + `randomBytes(3)`. `newFindingId(index?)` returns `F-001`-style padded ids when given a 0-based index, random `F-<8hex>` otherwise. Persona IDs are not generated here (externally formatted per the boot prompt).
+- `packages/core/src/time.ts` — `nowIsoUtc / parseIsoUtc / isoToEpochMs / epochMsToIso / normalizeIsoToUtc`. ISO-8601 regex enforces explicit timezone (Z or ±HH:MM), so a naïve `2026-05-01T13:30:00` is rejected.
+- 11 new tests + 46 existing → **57/57 green**. Coverage: 10k unique ids per generator under load, sequential F-001 progression up to F-1000, random F-* never collides with sequential, negative/non-integer index rejection, time-sortable across ms boundaries, ISO with Z and offset, KST↔UTC conversion preserving the session window endpoints, ms precision roundtrip, NaN/Infinity rejection.
+
+**Gates**
+
+- pnpm typecheck: pass (11 packages)
+- pnpm lint: pass (78 files, 5 cosmetic auto-fixes)
+- pnpm test: pass (core 57/57)
+
+**Phase 1 status**
+
+- TASK-001 ✓ TASK-002 ✓ TASK-003 ✓ TASK-004 ✓ TASK-005 ✓
+- Next iteration: TASK-006 (Phase 1 boundary — Pattern C with phase-tester + spec-reviewer).
+
+---
+
 ## Iteration 4 — 2026-05-01 13:53 KST — TASK-004 FrictionSignal + UXFinding + Interview schemas
 
 **Pattern:** A

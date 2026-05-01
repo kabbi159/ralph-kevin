@@ -2,7 +2,7 @@
   "id": "TASK-005",
   "phase": "P1",
   "title": "ID generators (run, persona, event, finding) + ISO-8601 timestamp helpers",
-  "status": "pending",
+  "status": "completed",
   "pattern": "A",
   "acceptance": [
     "packages/core/src/ids.ts exports newRunId(), newEventId(), newFindingId(), newSignalId() with stable, collision-resistant prefixes (run_, evt_, F-, fs_)",
@@ -15,5 +15,7 @@
     "packages/core/src/__tests__/ids.test.ts",
     "packages/core/src/__tests__/time.test.ts"
   ],
-  "depends": ["TASK-001"]
+  "depends": [
+    "TASK-001"
+  ]
 }
