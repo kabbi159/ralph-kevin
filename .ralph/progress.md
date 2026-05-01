@@ -4,6 +4,29 @@ Each iteration appends one block. Newest at the top.
 
 ---
 
+## Iteration 4 — 2026-05-01 13:53 KST — TASK-004 FrictionSignal + UXFinding + Interview schemas
+
+**Pattern:** A
+
+**What happened**
+
+- `packages/core/src/schemas/friction-signal.ts` — `FrictionSignalTypeSchema` enum covers all 11 types from docs/04 (long_hesitation, repeated_click, dead_click, backtrack, form_error, scroll_search, task_abandonment, cta_not_found, copy_confusion, price_uncertainty, trust_uncertainty). Evidence requires ≥1 eventId.
+- `packages/core/src/schemas/ux-finding.ts` — `UXFindingSchema` requires evidence.eventIds + frictionSignalIds (both ≥1), diagnosis.confidence ∈ [0, 1], recommendation.acceptanceCriteria ≥1, non-empty codingAgentPrompt. The shape directly matches docs/04 §Finding generation, so the analyzer's output is type-checked.
+- `packages/core/src/schemas/interview.ts` — `InterviewSchema` enforces 3-5 Q&A pairs and requires every pair to cite ≥1 eventId so the interview generator cannot invent unsupported issues.
+- 15 new tests + 31 existing → **46/46 green**. Coverage: all 11 friction types listed in stable order; valid signals; missing eventIds rejected; unknown type rejected; finding round-trip; out-of-range confidence rejected with descriptive path; missing eventIds/signalIds/criteria rejected; empty codingAgentPrompt rejected; 3-pair / 5-pair acceptance; <3 / >5 / ungrounded pair rejected.
+
+**Gates**
+
+- pnpm typecheck: pass (11 packages)
+- pnpm lint: pass (74 files, 3 cosmetic auto-fixes)
+- pnpm test: pass (core 46/46)
+
+**Next iteration**
+
+- TASK-005: ID generators + ISO-8601 timestamp helpers in `packages/core/src/{ids,time}.ts`.
+
+---
+
 ## Iteration 3 — 2026-05-01 13:51 KST — TASK-003 RunConfig + RunEvent + Artifact schemas
 
 **Pattern:** A

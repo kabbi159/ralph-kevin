@@ -2,7 +2,7 @@
   "id": "TASK-004",
   "phase": "P1",
   "title": "FrictionSignal + UXFinding + Interview Zod schemas",
-  "status": "pending",
+  "status": "completed",
   "pattern": "A",
   "acceptance": [
     "FrictionSignalSchema covers all 11 type literals from docs/04",
@@ -16,5 +16,7 @@
     "packages/core/src/schemas/interview.ts",
     "packages/core/src/__tests__/ux-finding.test.ts"
   ],
-  "depends": ["TASK-003"]
+  "depends": [
+    "TASK-003"
+  ]
 }

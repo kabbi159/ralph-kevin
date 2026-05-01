@@ -5,3 +5,6 @@ export * from "./agent-action";
 export * from "./run-config";
 export * from "./run-event";
 export * from "./artifact";
+export * from "./friction-signal";
+export * from "./ux-finding";
+export * from "./interview";
