@@ -1,5 +1,5 @@
 {
-  "iteration": 19,
+  "iteration": 21,
   "currentPhase": "P3",
   "currentTaskId": "TASK-024",
   "currentTaskStatus": "completed",
@@ -8,12 +8,12 @@
   "branch": "develop",
   "lastCommitSha": "ff9abcc14457881a03d4f0498eb8bd61a11e9171",
   "lastPushAt": "2026-05-01T13:44:16+0900",
-  "handoffNote": "Iteration 19: stretch S2 multi-persona shipped. 178 tests green. Demo path closed (G1+G2+G3). 25+ commits to develop.",
+  "handoffNote": "G4 closed (clone-and-install distribution). install/uninstall/mcp-stub commands ship; 6 install tests cover idempotency, key preservation, isInstalled toggle, hostile-cwd rejection. All four demo gates G1+G2+G3+G4 GREEN.",
   "gates": {
     "G1": "green",
     "G2": "green",
     "G3": "green",
-    "G4": "deferred"
+    "G4": "green"
   },
   "stretchQueueProgress": {
     "current": null,

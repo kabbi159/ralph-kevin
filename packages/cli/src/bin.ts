@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { compareCommand } from "./compare-command";
+import { installCommand, uninstallCommand } from "./install-command";
 import { runBatchCommand, runCommand } from "./run-command";
 
 const args = process.argv.slice(2);
@@ -15,6 +16,8 @@ const flag = (name: string): string | undefined => {
   if (typeof v !== "string" || v.startsWith("--")) return undefined;
   return v;
 };
+
+const hasFlag = (name: string): boolean => args.includes(name);
 
 const printHelp = (): void => {
   console.log(`personabench — data-grounded persona UX testing CLI
@@ -33,6 +36,11 @@ Commands:
                           Render compare-<a>.html into <b>'s run dir.
   demo                    One-command demo (scripted mode against
                           examples/run-config.checkout.json).
+  mcp                     Launch the MCP server (stub; stretch S5).
+  install [--codex] [--dry-run]
+                          Register CLI globally + add mcpServers entry +
+                          symlink claude-code plugin (G4).
+  uninstall [--dry-run]   Reverse install.
   --version               Print version.
   --help                  Print this message.
 `);
@@ -115,6 +123,36 @@ const main = async (): Promise<void> => {
     console.log(`resolved:  ${r.resolvedFindings.length}`);
     console.log(`new:       ${r.newFindings.length}`);
     console.log(`compare:   file://${r.comparePath}`);
+    return;
+  }
+
+  if (cmd === "mcp") {
+    if (hasFlag("--help") || hasFlag("-h")) {
+      console.log(
+        "personabench mcp — MCP server (stub; full stdio implementation deferred to stretch S5).",
+      );
+      return;
+    }
+    console.error(
+      "personabench mcp: full MCP stdio server is deferred (stretch S5). The stub command exits 0 so the install path can register the entry.",
+    );
+    return;
+  }
+
+  if (cmd === "install") {
+    const result = installCommand({
+      dryRun: hasFlag("--dry-run"),
+      codex: hasFlag("--codex"),
+    });
+    for (const step of result.steps) console.log(`  ✓ ${step}`);
+    for (const warn of result.warnings) console.error(`  ⚠ ${warn}`);
+    return;
+  }
+
+  if (cmd === "uninstall") {
+    const result = uninstallCommand({ dryRun: hasFlag("--dry-run") });
+    for (const step of result.steps) console.log(`  ✓ ${step}`);
+    for (const warn of result.warnings) console.error(`  ⚠ ${warn}`);
     return;
   }
 
