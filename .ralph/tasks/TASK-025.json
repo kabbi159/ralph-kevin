@@ -12,11 +12,5 @@
     "Single commit with phase-complete trailer"
   ],
   "files": [],
-  "depends": [
-    "TASK-020",
-    "TASK-021",
-    "TASK-022",
-    "TASK-023",
-    "TASK-024"
-  ]
+  "depends": ["TASK-020", "TASK-021", "TASK-022", "TASK-023", "TASK-024"]
 }

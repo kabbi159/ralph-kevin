@@ -1,0 +1,21 @@
+{
+  "id": "TASK-040",
+  "phase": "P5",
+  "title": "Friction detection heuristics — 5+ deterministic detectors over the event log",
+  "status": "completed",
+  "pattern": "A",
+  "acceptance": [
+    "packages/analyzer/src/friction/{detect-long-hesitation,detect-repeated-click,detect-dead-click,detect-backtrack,detect-cta-not-found,detect-price-uncertainty,detect-trust-uncertainty}.ts",
+    "Each detector takes RunEvent[] and emits FrictionSignal[] (Zod-valid)",
+    "Aggregator runDetectors(events) runs the full set and returns combined signals deduped by id",
+    "Tests: a fixture event log with seeded patterns produces the exact signal counts for each heuristic"
+  ],
+  "files": [
+    "packages/analyzer/src/friction/index.ts",
+    "packages/analyzer/src/friction/detectors.ts",
+    "packages/analyzer/src/__tests__/friction.test.ts"
+  ],
+  "depends": [
+    "TASK-025"
+  ]
+}

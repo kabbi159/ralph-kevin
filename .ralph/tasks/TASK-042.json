@@ -1,0 +1,20 @@
+{
+  "id": "TASK-042",
+  "phase": "P5",
+  "title": "Interview generator (3-5 Q&A pairs grounded in eventIds)",
+  "status": "completed",
+  "pattern": "A",
+  "acceptance": [
+    "packages/analyzer/src/interview/generate.ts: generateInterview(events, signals, persona, runId) → Interview",
+    "Q&A pairs always cite ≥1 eventId; the generator never invents an issue not reflected in the log",
+    "Default questions match docs/04 §Interview generation; answers derived from observed friction patterns",
+    "Tests: a fixture friction-signal set produces the expected 3-5 pair interview, all eventIds resolvable in the source events"
+  ],
+  "files": [
+    "packages/analyzer/src/interview/generate.ts",
+    "packages/analyzer/src/__tests__/interview.test.ts"
+  ],
+  "depends": [
+    "TASK-041"
+  ]
+}

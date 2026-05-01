@@ -1,0 +1,22 @@
+{
+  "id": "TASK-041",
+  "phase": "P5",
+  "title": "Finding aggregator + severity scoring",
+  "status": "completed",
+  "pattern": "A",
+  "acceptance": [
+    "packages/analyzer/src/findings/aggregate.ts: aggregateFindings(signals, events, persona, runId) → UXFinding[]",
+    "Severity scoring deterministic: critical ≥2 personas blocked, high task abandonment / payment unclear, medium hesitation+backtrack, low minor",
+    "Each finding includes evidence (eventIds, frictionSignalIds, screenshots) and a rendered codingAgentPrompt",
+    "Tests: a fixture friction-signal set produces stable findings (snapshot)"
+  ],
+  "files": [
+    "packages/analyzer/src/findings/aggregate.ts",
+    "packages/analyzer/src/findings/severity.ts",
+    "packages/analyzer/src/findings/fix-prompt.ts",
+    "packages/analyzer/src/__tests__/findings.test.ts"
+  ],
+  "depends": [
+    "TASK-040"
+  ]
+}

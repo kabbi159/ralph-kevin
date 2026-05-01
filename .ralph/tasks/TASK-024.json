@@ -16,7 +16,5 @@
     "packages/runner/src/event-log.ts",
     "packages/runner/src/__tests__/run-persona-test.test.ts"
   ],
-  "depends": [
-    "TASK-023"
-  ]
+  "depends": ["TASK-023"]
 }

@@ -1,0 +1,19 @@
+{
+  "id": "TASK-043",
+  "phase": "P5",
+  "title": "Phase 5 boundary (Pattern C, abbreviated)",
+  "status": "completed",
+  "pattern": "C",
+  "acceptance": [
+    "phase-tester runs `pnpm --filter @personabench/analyzer test` and reports green",
+    "spec-reviewer audits packages/analyzer against docs/04 §Friction signals + §Finding generation + §Interview generation",
+    "All P5 tasks marked completed",
+    "Single commit with phase-complete trailer"
+  ],
+  "files": [],
+  "depends": [
+    "TASK-040",
+    "TASK-041",
+    "TASK-042"
+  ]
+}
