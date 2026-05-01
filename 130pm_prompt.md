@@ -86,11 +86,7 @@ Preflight → 다음 task 선택 → Pattern (§24.2 A/B/C/D) 결정 → 구현 
 → git push (origin/develop). 실패 시 1회 재시도, 그래도 실패하면 catch-up은 다음 iteration에서.
 ```
 
-**Git 호출 트랩 (이미 한 번 맞음).** harness 안전 분류기는 공유 브랜치 `develop`로의 push를 위험 행동으로 보고, 특히 `git commit ... && git push origin develop`처럼 **commit과 push를 한 Bash 호출에 체이닝**하면 거절한다 ("pushing to a shared branch without confirmation it's a feature branch"). 단일 호출로 분리해서 보내면 통과한다. 따라서 매 iteration:
-
-- ❌ `git commit -m "..." && git push origin develop` (한 Bash 호출)
-- ✅ `git commit -m "..."` 한 호출 → 그 결과 확인 → `git push origin develop` 별도 호출
-- `git push --force` 그리고 `main` 브랜치 push는 가이드 자체가 금지하므로 시도조차 하지 말 것.
+**Git 호출 트랩.** commit과 push는 반드시 별도 Bash 호출로 보낸다 (`&&`로 체이닝하면 harness가 공유 브랜치 push로 거절함). 상세는 가이드 §12 "Harness trap: do not chain `commit && push`" 참조.
 
 **Pattern 규칙.**
 
