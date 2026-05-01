@@ -19,7 +19,5 @@
     "packages/core/src/index.ts",
     "packages/core/src/__tests__/persona-record.test.ts"
   ],
-  "depends": [
-    "TASK-000"
-  ]
+  "depends": ["TASK-000"]
 }

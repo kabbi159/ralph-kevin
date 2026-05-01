@@ -4,6 +4,28 @@ Each iteration appends one block. Newest at the top.
 
 ---
 
+## Iteration 2 — 2026-05-01 13:48 KST — TASK-002 PersonaUXProfile + AgentAction schemas
+
+**Pattern:** A
+
+**What happened**
+
+- `packages/core/src/schemas/persona-ux-profile.ts` — `PersonaUXBehaviorSchema` + `PersonaTaskBehaviorInstructionsSchema` + `PersonaUXProfileSchema`. The profile carries `sourceProvenance` (re-using `PersonaSourceSchema`), the four taskBehaviorInstruction strings, and the rendered `promptBlock` that the runtime DecisionProvider injects.
+- `packages/core/src/schemas/agent-action.ts` — discriminated union on `type` with click/type/scroll/wait/back/stop variants. `reason` is required on every variant so the analyzer can ground each event.
+- 8 new tests + the 12 existing → **20/20 green**. Coverage: every variant, unknown type rejection, missing reason rejection, unknown stop outcome rejection, negative wait duration rejection, click without selector but with x/y, UX profile round-trip, empty promptBlock rejection.
+
+**Gates**
+
+- pnpm typecheck: pass (11 packages)
+- pnpm lint: pass (66 files, 4 cosmetic auto-fixes)
+- pnpm test: pass (core 20/20)
+
+**Next iteration**
+
+- TASK-003: RunConfig + RunEvent + Artifact Zod schemas (must validate `examples/run-config.checkout.json` and `run-config.crack.json` end-to-end).
+
+---
+
 ## Iteration 1 — 2026-05-01 13:46 KST — TASK-001 PersonaRecord + PersonaSearchQuery schemas
 
 **Pattern:** A (single-package, clear spec)
