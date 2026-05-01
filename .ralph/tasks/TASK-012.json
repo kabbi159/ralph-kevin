@@ -2,7 +2,7 @@
   "id": "TASK-012",
   "phase": "P2",
   "title": "PersonaCompiler — PersonaRecord → PersonaUXProfile with promptBlock",
-  "status": "pending",
+  "status": "completed",
   "pattern": "B",
   "acceptance": [
     "packages/personas/src/compiler/compile-persona.ts: compilePersona(record: PersonaRecord, productContext?): PersonaUXProfile",
@@ -18,5 +18,7 @@
     "packages/personas/src/compiler/prompt-templates.ts",
     "packages/personas/src/__tests__/compile-persona.test.ts"
   ],
-  "depends": ["TASK-011"]
+  "depends": [
+    "TASK-011"
+  ]
 }

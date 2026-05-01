@@ -17,7 +17,5 @@
     "packages/personas/src/normalizers/embedding-text.ts",
     "packages/personas/src/__tests__/nemotron-normalizer.test.ts"
   ],
-  "depends": [
-    "TASK-010"
-  ]
+  "depends": ["TASK-010"]
 }

@@ -4,6 +4,53 @@ Each iteration appends one block. Newest at the top.
 
 ---
 
+## Iteration 9 — 2026-05-01 14:09 KST — TASK-012 PersonaCompiler
+
+**Pattern:** A
+
+**What happened**
+
+- `packages/personas/src/compiler/prompt-templates.ts` — `REQUIRED_SYSTEM_INSTRUCTION` (the docs/03 §Required persona system instruction, verbatim, unmodifiable), `UNTRUSTED_CONTENT_INSTRUCTION` (docs/07 §Prompt injection defense), `TASK_BEHAVIOR_DEFAULTS` (the four taskBehaviorInstructions strings).
+- `packages/personas/src/compiler/compile-persona.ts` — `compilePersona(record, productContext?)` produces a `PersonaUXProfile`. Each uxBehavior facet is rendered from a small, deterministic decision tree over the record's `derivedTraits` bands (low/medium/high/unknown). No LLM call here — the compiler is a pure function so tests can assert specific output.
+- The compiler enforces three AGENTS.md / docs/03 invariants at write time: provenance preserved (`sourceProvenance ← record.source`), no demographic claim invented (occupation/age/region only mentioned when present), no representativeness phrasing ("typical user", "average user", "all users", etc. blocked by tests).
+- 8 vitest assertions: round-trip via PersonaUXProfileSchema, provenance preserved, REQUIRED_SYSTEM_INSTRUCTION verbatim in promptBlock, no occupation invention on sparse rows, no representativeness phrasing, productContext rendering, trait-conditional facets, locale-agnostic on a US/EN record.
+
+**Gates**
+
+- pnpm typecheck: pass (11 packages)
+- pnpm lint: pass (94 files, 3 cosmetic auto-fixes)
+- pnpm test: pass (core 57/57 + personas 26/26 = 83/83)
+
+**Phase 2 status**
+
+- TASK-010 ✓ TASK-011 ✓ TASK-012 ✓
+- Remaining: TASK-013 (LocalParquetNemotronSource) is the load-bearing one for the demo path. TASK-014 (BYO JSON) and TASK-015 (HF fallback) can defer to stretch S6.
+
+**Next iteration**
+
+- TASK-013: LocalParquetNemotronSource — DuckDB-backed PersonaSource over the 9 Korea shards.
+
+---
+
+## Iteration 8 — 2026-05-01 14:04 KST — TASK-011 NemotronNormalizer (locale-agnostic)
+
+**Pattern:** A (was scoped as B; downgraded once the parquet schema was already mapped in iteration 7's probe)
+
+**Sub-agents consulted (1)**
+
+- `dataset-validator` ran a small DuckDB query against the real Korea parquet shard 0, picked 5 rows at age=19 + 3 rows at age∈{40,45,50,55,60,65}, ran them through `normalizeNemotronRow`. **8/8 rows passed `PersonaRecordSchema`**. Provenance verified (`source.provider==='nvidia'`, `dataset`, `rowId` matches `uuid` exactly, license carried). `military_status` and `bachelors_field` from real rows landed in `narratives.raw`. No surprise columns — the parquet has 25 data columns, 23 land first-class, 2 in raw, FIRST_CLASS_MAP accounts for everything. No normalization bugs.
+
+**What happened**
+
+- `packages/personas/src/normalizers/nemotron.ts` — `normalizeNemotronRow(row, ctx)` with `FIRST_CLASS_MAP` table mapping every documented Nemotron column → camelCase PersonaRecord path; everything else flows into `narratives.raw`. BIGINT age coerced via `Number()`. List columns (skills/hobbies) JSON-parsed, comma-split fallback, empty drops.
+- `packages/personas/src/normalizers/embedding-text.ts` — UX-focused template per docs/03 §Embedding text builder.
+
+**Gates**
+
+- core 57/57 + personas 18/18 = 75/75 green; typecheck/lint clean.
+
+---
+
 ## Iteration 7 — 2026-05-01 14:01 KST — TASK-010 PersonaSource interface + MockPersonaSource
 
 **Pattern:** A
