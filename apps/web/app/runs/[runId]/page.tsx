@@ -61,6 +61,13 @@ export default async function RunDetailPage({
   const persona =
     (personas[0] as {
       id?: string;
+      source?: {
+        provider?: string;
+        dataset?: string;
+        datasetRevision?: string;
+        rowId?: string;
+        license?: string;
+      };
       demographics?: { age?: number; occupation?: string };
       locale?: { province?: string };
       narratives?: { persona?: string };
@@ -119,6 +126,41 @@ export default async function RunDetailPage({
                 {persona.narratives?.persona ?? ""}
               </p>
               <p className="mt-2 font-mono text-xs text-slate-500">{persona.id}</p>
+              {persona.source ? (
+                <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/60 p-4 text-xs">
+                  <p className="mb-2 font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                    데이터 출처
+                  </p>
+                  <dl className="grid grid-cols-[110px_1fr] gap-y-1 font-mono text-slate-300">
+                    <dt className="text-slate-500">provider</dt>
+                    <dd>{persona.source.provider ?? "—"}</dd>
+                    <dt className="text-slate-500">dataset</dt>
+                    <dd className="break-all">{persona.source.dataset ?? "—"}</dd>
+                    {persona.source.rowId ? (
+                      <>
+                        <dt className="text-slate-500">rowId</dt>
+                        <dd className="break-all">{persona.source.rowId}</dd>
+                      </>
+                    ) : null}
+                    {persona.source.license ? (
+                      <>
+                        <dt className="text-slate-500">license</dt>
+                        <dd>{persona.source.license}</dd>
+                      </>
+                    ) : null}
+                  </dl>
+                  {persona.source.dataset?.includes("Nemotron-Personas") ? (
+                    <a
+                      className="mt-3 inline-block text-cyan-300 hover:underline"
+                      href={`https://huggingface.co/datasets/${persona.source.dataset}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Hugging Face 원본 데이터셋 ↗
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
             </CardContent>
           </Card>
         </section>
