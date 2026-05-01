@@ -1,0 +1,36 @@
+{
+  "id": "TASK-000",
+  "phase": "P0",
+  "title": "Bootstrap monorepo + .ralph scaffolding",
+  "status": "completed",
+  "pattern": "A",
+  "iteration": 0,
+  "createdAt": "2026-05-01T13:30:00+09:00",
+  "acceptance": [
+    "pnpm-workspace.yaml + root package.json wire `pnpm -r` for build/typecheck/lint/test",
+    "tsconfig.base.json with strict TS, ES2022, Bundler module resolution",
+    "biome.json formatter+linter; vitest.config.ts with passWithNoTests",
+    "9 packages scaffolded under packages/ with src/index.ts + tsconfig.json",
+    "apps/web Next.js 15 stub on port 3000",
+    "examples/ecommerce-checkout Next.js 15 stub on port 3100 with the four documented intentional UX defects",
+    ".ralph/ contains prd.json, status.json, progress.md, learnings.md, steering.md, spec-changes.md, stretch-queue.md, tasks/",
+    "scripts/ralph/{preflight.sh, verify.sh, select-next-task.ts, update-task-status.ts} present",
+    "pnpm install / build / typecheck / lint / test all exit 0",
+    "Single commit with §12 trailers; separate `git push origin develop`"
+  ],
+  "files": [
+    "package.json",
+    "pnpm-workspace.yaml",
+    "tsconfig.base.json",
+    "biome.json",
+    "vitest.config.ts",
+    ".npmrc",
+    ".gitignore",
+    "packages/{core,personas,runner,recorder,analyzer,cli,mcp-server,integrations,ui}/**",
+    "apps/web/**",
+    "examples/ecommerce-checkout/**",
+    ".ralph/**",
+    "scripts/ralph/**"
+  ],
+  "depends": []
+}

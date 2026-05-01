@@ -1,0 +1,23 @@
+{
+  "id": "TASK-001",
+  "phase": "P1",
+  "title": "PersonaRecord + PersonaSearchQuery Zod schemas (locale-agnostic, narratives.raw catch-all)",
+  "status": "pending",
+  "pattern": "A",
+  "acceptance": [
+    "packages/core/src/schemas/persona-record.ts exports PersonaRecordSchema + inferred type PersonaRecord matching docs/03 §Normalized persona record",
+    "packages/core/src/schemas/persona-search-query.ts exports PersonaSearchQuerySchema matching docs/03 §Persona search query",
+    "narratives.raw is z.record(z.unknown()).optional() — catches arbitrary unknown columns",
+    "Zod errors on invalid fixture rejected with descriptive issue paths",
+    "Round-trip test: parse → JSON.stringify → parse → deep-equal on a Korea fixture row",
+    "Locale-agnostic test: synthetic row with extra unknown columns flows them into raw without dropping"
+  ],
+  "files": [
+    "packages/core/src/schemas/persona-record.ts",
+    "packages/core/src/schemas/persona-search-query.ts",
+    "packages/core/src/schemas/index.ts",
+    "packages/core/src/index.ts",
+    "packages/core/src/__tests__/persona-record.test.ts"
+  ],
+  "depends": ["TASK-000"]
+}

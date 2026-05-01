@@ -1,0 +1,165 @@
+{
+  "$schema": "./prd.schema.json",
+  "product": "PersonaBench",
+  "version": "0.1.0",
+  "ownerLoop": "ralph-kevin",
+  "branch": "develop",
+  "session": {
+    "windowStart": "2026-05-01T13:30:00+09:00",
+    "windowEnd": "2026-05-01T16:30:00+09:00",
+    "timezone": "Asia/Seoul"
+  },
+  "preDecided": {
+    "browserSubstrate": "agent-browser@>=0.26.0 (no direct Playwright; agent-browser chat forbidden)",
+    "decisionProvider": "Anthropic SDK direct; haiku-4-5-20251001 for runtime, sonnet-4-6 for finding/interview/fix-prompt",
+    "duckdb": "@duckdb/node-api@^1.5.2 (legacy `duckdb` package forbidden)",
+    "datasetPath": "data/personas/nemotron-korea/data/train-*.parquet (9 shards, 1,000,008 rows)",
+    "ageEdgeCase": "10대 후반 = ageMin/Max=19 (dataset has no 17/18 rows)",
+    "testRunner": "vitest",
+    "lintFormatter": "biome",
+    "monorepoTool": "pnpm -r (no turbo)",
+    "webFramework": "Next.js 15 App Router (apps/web on 3000, examples/ecommerce-checkout on 3100)",
+    "runArtifactsRoot": ".personabench/runs/<runId>/",
+    "personaIdFormat": "nemotron:<dataset>:<rowId-or-uuid> | mock_<n> | custom:<dataset>:<id>",
+    "narrativesRaw": "first-class extras (military_status, bachelors_field, …) flow into PersonaRecord.narratives.raw"
+  },
+  "immutables": {
+    "personaProvenance": "Persona records must always preserve source provenance; prompt-only personas are forbidden.",
+    "noRealActions": "No real purchases, destructive actions, or production data changes.",
+    "secretsMasking": "Secrets, passwords, credit cards, tokens, cookies, PII must be masked in all artifacts.",
+    "domainAllowlist": "Every run must define and enforce an allowed-domain list.",
+    "paymentBlock": "blockPaymentSubmission default true; final purchase confirmation always blocked.",
+    "noUserResearchClaim": "Synthetic personas must never be presented as a substitute for real user research.",
+    "automatedVerificationLocale": "Korea only — other locales are code-path supported but not test-exercised."
+  },
+  "phases": [
+    {
+      "id": "P0",
+      "name": "Bootstrap",
+      "tasks": ["TASK-000"],
+      "tests": [
+        "pnpm install succeeds on clean clone",
+        "pnpm build / typecheck / lint / test exit 0 on placeholder packages",
+        "examples/ecommerce-checkout boots locally on port 3100"
+      ],
+      "boundary": "main-thread (active-only)"
+    },
+    {
+      "id": "P1",
+      "name": "Core schemas",
+      "tasks": ["TASK-001", "TASK-002", "TASK-003", "TASK-004", "TASK-005", "TASK-006"],
+      "tests": [
+        "fixture round-trip",
+        "Zod errors on invalid input",
+        "narratives.raw locale-agnostic"
+      ],
+      "boundary": "Pattern C (phase-tester + spec-reviewer)"
+    },
+    {
+      "id": "P2",
+      "name": "Persona layer",
+      "tasks": ["TASK-010", "TASK-011", "TASK-012", "TASK-013", "TASK-014", "TASK-015"],
+      "tests": [
+        "normalizer Korea row mapping",
+        "DuckDB query filters",
+        "diversity sampling distributes"
+      ],
+      "boundary": "Pattern C (phase-tester + spec-reviewer + dataset-validator)"
+    },
+    {
+      "id": "P3",
+      "name": "Runner",
+      "tasks": ["TASK-020", "TASK-021", "TASK-022", "TASK-023", "TASK-024", "TASK-025", "TASK-026"],
+      "tests": [
+        "agent-browser lifecycle",
+        "snapshot parser",
+        "allowlist + payment block",
+        "ClaudeDecisionProvider mock"
+      ],
+      "boundary": "Pattern C (phase-tester + spec-reviewer + safety-auditor)"
+    },
+    {
+      "id": "P4",
+      "name": "Recorder (deferred — see stretch S10)",
+      "tasks": ["TASK-030", "TASK-031"],
+      "tests": ["screenshots written", "redaction masks payment fields"],
+      "boundary": "main-thread (deferred full integration to S10)"
+    },
+    {
+      "id": "P5",
+      "name": "Analyzer",
+      "tasks": ["TASK-040", "TASK-041", "TASK-042", "TASK-043", "TASK-044"],
+      "tests": [
+        "each friction heuristic detects target pattern",
+        "finding evidence linkage",
+        "fix prompt snapshot"
+      ],
+      "boundary": "Pattern C (phase-tester + spec-reviewer)"
+    },
+    {
+      "id": "P6",
+      "name": "CLI",
+      "tasks": ["TASK-050", "TASK-051", "TASK-052", "TASK-053", "TASK-054", "TASK-055"],
+      "tests": ["each command --help snapshot", "demo G3 ≤2min", "install G4 idempotent"],
+      "boundary": "Pattern C (phase-tester + spec-reviewer)"
+    },
+    {
+      "id": "P7",
+      "name": "Local report (report.html)",
+      "tasks": ["TASK-060", "TASK-061"],
+      "tests": ["self-contained HTML", "snapshot stable", "no PII leak"],
+      "boundary": "main-thread (active-only)"
+    },
+    {
+      "id": "P10-demo",
+      "name": "Example app integration + G1/G2/G3 closure",
+      "tasks": ["TASK-070", "TASK-071", "TASK-072"],
+      "tests": ["G1 ≥3 friction signals + ≥1 high finding", "G2 fix → resolved", "G3 demo ≤2min"],
+      "boundary": "main-thread (gate-driven)"
+    },
+    {
+      "id": "P8",
+      "name": "Web app",
+      "tasks": ["TASK-080", "TASK-081", "TASK-082"],
+      "tests": ["pages render SSR", "polling cycle", "compare diff"],
+      "boundary": "main-thread (active-only)"
+    },
+    {
+      "id": "P9",
+      "name": "MCP server",
+      "tasks": ["TASK-090", "TASK-091"],
+      "tests": ["tool input/output schemas match docs/06", "stdio handshake"],
+      "boundary": "main-thread (active-only)"
+    },
+    {
+      "id": "P11",
+      "name": "Persona packs polish",
+      "tasks": ["TASK-110", "TASK-111"],
+      "tests": ["pack roundtrip", "pack reuse on /runs/new"],
+      "boundary": "main-thread (active-only)"
+    },
+    {
+      "id": "P10-int",
+      "name": "Integrations (gh / Linear / Jira / copy-paste)",
+      "tasks": ["TASK-100", "TASK-101"],
+      "tests": ["copy-paste fallback always works", "missing token → graceful no-op"],
+      "boundary": "main-thread (active-only)"
+    }
+  ],
+  "demoGates": {
+    "G1": "personabench run --config examples/run-config.checkout.json → ≥3 FrictionSignal + ≥1 high/critical UXFinding",
+    "G2": "Apply fix-prompts/F-001.md to examples/ecommerce-checkout → rerun → personabench compare A B → finding resolved",
+    "G3": "pnpm personabench demo: example boot → run → report.html opens, ≤2 minutes start to finish",
+    "G4": "Clone-and-install distribution; CLI binary global, MCP entry registered, plugin symlinked, all reversible"
+  },
+  "stretchQueue": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10"],
+  "forbiddenWhileActive": [
+    "refactor / rename / reorganize unrelated to demo path",
+    "new packages/tooling (turbo, nx, changesets, husky, jest, eslint, prettier, mocha)",
+    "hosted-track features (auth, multi-tenant, pgvector, separate API server, billing)",
+    "premature optimization (caching, parallelism, indexing)",
+    "different LLM model than haiku-4-5 / sonnet-4-6",
+    "speculative abstractions for hypothetical futures",
+    "code without tests (exception: docs and intentionally-flawed example UI)"
+  ]
+}

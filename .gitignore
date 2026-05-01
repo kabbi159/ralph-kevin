@@ -15,3 +15,24 @@ data/personas/
 
 # Run artifacts
 .personabench/
+
+# Node / pnpm
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Ralph loop artifacts
+.ralph/iteration-logs/
+
+# IDE
+.idea/
+.vscode/
+
+# Test coverage
+coverage/

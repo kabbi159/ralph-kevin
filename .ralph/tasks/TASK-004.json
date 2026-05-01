@@ -1,0 +1,20 @@
+{
+  "id": "TASK-004",
+  "phase": "P1",
+  "title": "FrictionSignal + UXFinding + Interview Zod schemas",
+  "status": "pending",
+  "pattern": "A",
+  "acceptance": [
+    "FrictionSignalSchema covers all 11 type literals from docs/04",
+    "UXFindingSchema requires evidence.eventIds + frictionSignalIds + diagnosis.confidence∈[0,1] + codingAgentPrompt",
+    "InterviewSchema covers 3-5 Q&A pairs grounded in eventIds",
+    "Round-trip + invalid tests"
+  ],
+  "files": [
+    "packages/core/src/schemas/friction-signal.ts",
+    "packages/core/src/schemas/ux-finding.ts",
+    "packages/core/src/schemas/interview.ts",
+    "packages/core/src/__tests__/ux-finding.test.ts"
+  ],
+  "depends": ["TASK-003"]
+}

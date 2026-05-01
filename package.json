@@ -1,0 +1,33 @@
+{
+  "name": "personabench",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PersonaBench — data-grounded persona UX testing (open-source product).",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.17.1",
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "biome check --write .",
+    "lint:check": "biome check .",
+    "format": "biome format --write .",
+    "test": "pnpm -r --if-present test",
+    "personabench": "tsx packages/cli/src/bin.ts",
+    "demo": "pnpm personabench demo",
+    "demo:crack": "pnpm personabench demo:crack",
+    "ralph:preflight": "bash scripts/ralph/preflight.sh",
+    "ralph:verify": "bash scripts/ralph/verify.sh",
+    "ralph:next": "tsx scripts/ralph/select-next-task.ts",
+    "ralph:status": "tsx scripts/ralph/update-task-status.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "TASK-006",
+  "phase": "P1",
+  "title": "Phase 1 boundary: phase-tester + spec-reviewer (Pattern C)",
+  "status": "pending",
+  "pattern": "C",
+  "acceptance": [
+    "phase-tester runs `pnpm --filter @personabench/core test` + reports green",
+    "spec-reviewer audits packages/core schemas against docs/03 + docs/04 + docs/06 acceptance criteria",
+    "all P1 tasks (TASK-001..TASK-005) marked completed",
+    "single commit with phase-complete trailer"
+  ],
+  "files": [],
+  "depends": ["TASK-001", "TASK-002", "TASK-003", "TASK-004", "TASK-005"]
+}

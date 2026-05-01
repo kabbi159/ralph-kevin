@@ -1,0 +1,18 @@
+{
+  "id": "TASK-002",
+  "phase": "P1",
+  "title": "PersonaUXProfile + AgentAction Zod schemas",
+  "status": "pending",
+  "pattern": "A",
+  "acceptance": [
+    "PersonaUXProfileSchema includes background, uxBehavior, taskBehaviorInstructions, promptBlock; provenance preserved",
+    "AgentActionSchema is a discriminated union on `type` covering click/type/scroll/wait/back/stop per docs/04",
+    "Round-trip + invalid-fixture tests"
+  ],
+  "files": [
+    "packages/core/src/schemas/persona-ux-profile.ts",
+    "packages/core/src/schemas/agent-action.ts",
+    "packages/core/src/__tests__/agent-action.test.ts"
+  ],
+  "depends": ["TASK-001"]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@personabench/runner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@personabench/core": "workspace:*",
+    "@personabench/personas": "workspace:*",
+    "@personabench/recorder": "workspace:*",
+    "@anthropic-ai/sdk": "^0.92.0",
+    "agent-browser": "^0.26.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "TASK-003",
+  "phase": "P1",
+  "title": "RunConfig + RunEvent + Artifact Zod schemas",
+  "status": "pending",
+  "pattern": "A",
+  "acceptance": [
+    "RunConfigSchema matches docs/04 §Run config (id, targetUrl, task, personaQuery|personaIds|personaPackId, viewport, limits, safety, artifacts)",
+    "RunEventSchema matches docs/04 §Run event schema",
+    "ArtifactSchema covers screenshot/trace/video/rrweb paths",
+    "examples/run-config.checkout.json validates against RunConfigSchema",
+    "examples/run-config.crack.json validates"
+  ],
+  "files": [
+    "packages/core/src/schemas/run-config.ts",
+    "packages/core/src/schemas/run-event.ts",
+    "packages/core/src/schemas/artifact.ts",
+    "packages/core/src/__tests__/run-config.test.ts"
+  ],
+  "depends": ["TASK-002"]
+}
