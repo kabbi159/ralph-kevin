@@ -10,6 +10,7 @@ import {
 } from "@personabench/core";
 import { MOCK_FIXTURES, MockPersonaSource, compilePersona } from "@personabench/personas";
 import { createFileEventSink } from "@personabench/runner";
+import { buildPersonaConditionedEvents } from "./persona-variance";
 import { renderReportHtml } from "./render-report";
 import { buildCheckoutPostFixEvents, buildCheckoutScriptedEvents } from "./scripted-run";
 
@@ -22,10 +23,12 @@ import { buildCheckoutPostFixEvents, buildCheckoutScriptedEvents } from "./scrip
 
 export type RunCommandOpts = {
   configPath: string;
-  mode?: "scripted" | "scripted-postfix" | "live";
+  mode?: "scripted" | "scripted-postfix" | "live" | "scripted-multi";
   runsRoot?: string;
   // Override the default persona source (used by tests).
   personaIdOverride?: string;
+  // For scripted-multi: how many personas to run. Default 3.
+  count?: number;
 };
 
 export type RunCommandResult = {
@@ -36,12 +39,70 @@ export type RunCommandResult = {
   signalCount: number;
 };
 
+export type RunBatchResult = {
+  batchId: string;
+  runs: RunCommandResult[];
+  perPersonaSummary: Array<{
+    personaId: string;
+    displayName: string;
+    signals: number;
+    findings: number;
+    severities: string[];
+  }>;
+};
+
 const findFirstMockMatching = (config: RunConfig) => {
   const src = new MockPersonaSource();
   if (config.personaQuery) {
     return src.search(config.personaQuery).then((r) => r.matches[0] ?? MOCK_FIXTURES[0]);
   }
   return Promise.resolve(MOCK_FIXTURES[0]);
+};
+
+const pickMultipleMockPersonas = async (
+  config: RunConfig,
+  count: number,
+): Promise<(typeof MOCK_FIXTURES)[number][]> => {
+  const src = new MockPersonaSource();
+  const matches = config.personaQuery
+    ? (await src.search(config.personaQuery)).matches
+    : [...MOCK_FIXTURES];
+  const out = matches.slice(0, count);
+  // Top up from the full fixture pool if the query under-resolved.
+  for (const fixture of MOCK_FIXTURES) {
+    if (out.length >= count) break;
+    if (!out.some((p) => p.id === fixture.id)) out.push(fixture);
+  }
+  return out.slice(0, count);
+};
+
+export const runBatchCommand = async (opts: RunCommandOpts): Promise<RunBatchResult> => {
+  const count = opts.count ?? 3;
+  const configPath = resolve(opts.configPath);
+  const runsRoot = opts.runsRoot ?? resolve(".personabench", "runs");
+  const rawConfig = JSON.parse(readFileSync(configPath, "utf8"));
+  const config = RunConfigSchema.parse(rawConfig);
+  const personas = await pickMultipleMockPersonas(config, count);
+  const batchId = newRunId();
+  const runs: RunCommandResult[] = [];
+  const perPersona: RunBatchResult["perPersonaSummary"] = [];
+  for (const personaRecord of personas) {
+    const r = await runCommand({
+      ...opts,
+      mode: "scripted-multi",
+      runsRoot,
+      personaIdOverride: personaRecord.id,
+    });
+    runs.push(r);
+    perPersona.push({
+      personaId: personaRecord.id,
+      displayName: `${personaRecord.demographics.age ?? "?"} ${personaRecord.demographics.occupation ?? "?"}`,
+      signals: r.signalCount,
+      findings: r.findings.length,
+      severities: r.findings.map((f) => f.severity),
+    });
+  }
+  return { batchId, runs, perPersonaSummary: perPersona };
 };
 
 export const runCommand = async (opts: RunCommandOpts): Promise<RunCommandResult> => {
@@ -61,7 +122,11 @@ export const runCommand = async (opts: RunCommandOpts): Promise<RunCommandResult
   mkdirSync(join(runDir, "fix-prompts"), { recursive: true });
 
   // 1. Pick a persona (mock for the demo path).
-  const personaRecord = (await findFirstMockMatching(config)) ?? MOCK_FIXTURES[0];
+  const overrideId = opts.personaIdOverride;
+  const personaRecord =
+    (overrideId
+      ? MOCK_FIXTURES.find((p) => p.id === overrideId)
+      : await findFirstMockMatching(config)) ?? MOCK_FIXTURES[0];
   if (!personaRecord) {
     throw new Error("personabench run: no persona records available");
   }
@@ -78,11 +143,13 @@ export const runCommand = async (opts: RunCommandOpts): Promise<RunCommandResult
       ? buildCheckoutPostFixEvents(runId, persona.personaId, startedAt)
       : mode === "scripted"
         ? buildCheckoutScriptedEvents(runId, persona.personaId, startedAt)
-        : (() => {
-            throw new Error(
-              "personabench run --live: end-to-end live runner deferred per .ralph/spec-changes.md (TASK-050).",
-            );
-          })();
+        : mode === "scripted-multi"
+          ? buildPersonaConditionedEvents(personaRecord, runId, startedAt)
+          : (() => {
+              throw new Error(
+                "personabench run --live: end-to-end live runner deferred per .ralph/spec-changes.md (TASK-050).",
+              );
+            })();
 
   // 3. Persist events.ndjson.
   const eventsPath = join(runDir, "events.ndjson");

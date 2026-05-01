@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { compareCommand } from "./compare-command";
-import { runCommand } from "./run-command";
+import { runBatchCommand, runCommand } from "./run-command";
 
 const args = process.argv.slice(2);
 const cmd = args[0] ?? "help";
@@ -23,9 +23,11 @@ Usage:
   personabench <command> [options]
 
 Commands:
-  run --config <path> [--mode scripted|scripted-postfix|live]
-                          Run a UX test from a config file. Default mode
-                          is scripted (deterministic checkout demo).
+  run --config <path> [--mode scripted|scripted-postfix|scripted-multi|live]
+                          [--count N]
+                          Run a UX test from a config file. --count N
+                          produces a multi-persona batch (mode forced
+                          to scripted-multi). Default mode is scripted.
   report --run <runId>    Re-render report.html for an existing run dir.
   compare <runIdA> <runIdB>
                           Render compare-<a>.html into <b>'s run dir.
@@ -52,7 +54,30 @@ const main = async (): Promise<void> => {
       console.error("personabench run: --config <path> is required");
       process.exit(2);
     }
-    const mode = (flag("--mode") ?? "scripted") as "scripted" | "scripted-postfix" | "live";
+    const countStr = flag("--count");
+    const count = countStr ? Number.parseInt(countStr, 10) : 1;
+    if (count > 1) {
+      const batch = await runBatchCommand({
+        configPath,
+        mode: "scripted-multi",
+        count,
+      });
+      console.log(`batch:     ${batch.batchId} · ${batch.runs.length} personas`);
+      for (const p of batch.perPersonaSummary) {
+        const sevs = p.severities.length > 0 ? `[${p.severities.join(",")}]` : "[]";
+        console.log(
+          `  ${p.personaId.padEnd(32)} signals=${String(p.signals).padEnd(2)} findings=${String(p.findings).padEnd(2)} ${sevs}`,
+        );
+      }
+      const last = batch.runs.at(-1);
+      if (last) console.log(`last report: file://${last.reportPath}`);
+      return;
+    }
+    const mode = (flag("--mode") ?? "scripted") as
+      | "scripted"
+      | "scripted-postfix"
+      | "scripted-multi"
+      | "live";
     const result = await runCommand({ configPath, mode });
     console.log(`run id:    ${result.runId}`);
     console.log(`run dir:   ${result.runDir}`);

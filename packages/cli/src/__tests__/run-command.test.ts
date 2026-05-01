@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { compareCommand } from "../compare-command";
-import { runCommand } from "../run-command";
+import { runBatchCommand, runCommand } from "../run-command";
 
 const REPO_ROOT = "/Users/kevin/ralph-kevin";
 const CHECKOUT_CONFIG = join(REPO_ROOT, "examples", "run-config.checkout.json");
@@ -101,4 +101,27 @@ describe("runCommand (scripted)", () => {
       rmSync(runsRoot, { recursive: true, force: true });
     }
   });
+
+  it("runBatchCommand produces 4 distinct personas with varying friction patterns (stretch S2)", async () => {
+    const runsRoot = mkdtempSync(join(tmpdir(), "personabench-cli-batch-"));
+    try {
+      const batch = await runBatchCommand({
+        configPath: CHECKOUT_CONFIG,
+        runsRoot,
+        count: 4,
+      });
+      expect(batch.runs).toHaveLength(4);
+      // Every run is fully persisted to its own dir
+      for (const r of batch.runs) {
+        expect(existsSync(join(r.runDir, "report.html"))).toBe(true);
+        expect(existsSync(join(r.runDir, "findings.json"))).toBe(true);
+      }
+      // Persona variance shows up — at least two distinct (signals, findings)
+      // shapes across the four personas.
+      const shapes = new Set(batch.perPersonaSummary.map((p) => `${p.signals}/${p.findings}`));
+      expect(shapes.size).toBeGreaterThanOrEqual(2);
+    } finally {
+      rmSync(runsRoot, { recursive: true, force: true });
+    }
+  }, 30_000);
 });
