@@ -4,6 +4,39 @@ Each iteration appends one block. Newest at the top.
 
 ---
 
+## Iteration 1 — 2026-05-01 13:46 KST — TASK-001 PersonaRecord + PersonaSearchQuery schemas
+
+**Pattern:** A (single-package, clear spec)
+
+**What happened**
+
+- `packages/core/src/schemas/persona-record.ts` — `PersonaSourceSchema`, `PersonaLocaleSchema`, `PersonaDemographicsSchema`, `PersonaNarrativesSchema` (with `raw: z.record(z.unknown()).optional()` catch-all), `PersonaDerivedTraitsSchema`, `PersonaRecordSchema`. All inferred types exported.
+- `packages/core/src/schemas/persona-search-query.ts` — `PersonaSearchQuerySchema` with `[number, number]` range tuples for UX traits, optional `diversityBy` enum array, `ageMin <= ageMax` refine on demographics.
+- `packages/core/src/schemas/index.ts` barrel + re-exports from `packages/core/src/index.ts`.
+- 12 vitest tests in `packages/core/src/__tests__/persona-record.test.ts`:
+  - Korea-shaped fixture round-trip through JSON
+  - provenance preservation
+  - `narratives.raw` survives `military_status`, `bachelors_field`, and an unknown future column
+  - minimum-surface acceptance (mock_*, custom:*)
+  - invalid provider / negative age rejected with descriptive `path`
+  - locale-agnostic synthetic English row routes unknown columns into raw
+  - checkout demo's persona query verbatim
+  - crack 19-19 narrow age window
+  - empty query
+  - unknown `diversityBy` enum rejected
+
+**Gates**
+
+- pnpm typecheck: pass (11 packages)
+- pnpm lint: pass (63 files, 2 cosmetic auto-fixes applied)
+- pnpm test: pass (`@personabench/core` 12/12 green; rest passWithNoTests)
+
+**Next iteration**
+
+- TASK-002: PersonaUXProfile + AgentAction Zod schemas.
+
+---
+
 ## Iteration 0 — 2026-05-01 13:30 KST — TASK-000 Bootstrap
 
 **Pattern:** A (main-thread, active)

@@ -2,7 +2,7 @@
   "id": "TASK-001",
   "phase": "P1",
   "title": "PersonaRecord + PersonaSearchQuery Zod schemas (locale-agnostic, narratives.raw catch-all)",
-  "status": "pending",
+  "status": "completed",
   "pattern": "A",
   "acceptance": [
     "packages/core/src/schemas/persona-record.ts exports PersonaRecordSchema + inferred type PersonaRecord matching docs/03 §Normalized persona record",
@@ -19,5 +19,7 @@
     "packages/core/src/index.ts",
     "packages/core/src/__tests__/persona-record.test.ts"
   ],
-  "depends": ["TASK-000"]
+  "depends": [
+    "TASK-000"
+  ]
 }
