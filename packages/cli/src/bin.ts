@@ -92,11 +92,20 @@ const main = async (): Promise<void> => {
     }
     const countStr = flag("--count");
     const count = countStr ? Number.parseInt(countStr, 10) : 1;
+    const requestedMode = flag("--mode") as
+      | "scripted"
+      | "scripted-postfix"
+      | "scripted-multi"
+      | "live"
+      | undefined;
+    const langArg = (flag("--lang") ?? "auto") as "ko" | "en" | "auto";
     if (count > 1) {
+      const batchMode = requestedMode === "live" ? "live" : "scripted-multi";
       const batch = await runBatchCommand({
         configPath,
-        mode: "scripted-multi",
+        mode: batchMode,
         count,
+        lang: langArg,
       });
       console.log(`batch:     ${batch.batchId} · ${batch.runs.length} personas`);
       for (const p of batch.perPersonaSummary) {

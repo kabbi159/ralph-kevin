@@ -90,10 +90,15 @@ export const runBatchCommand = async (opts: RunCommandOpts): Promise<RunBatchRes
   const batchId = newRunId();
   const runs: RunCommandResult[] = [];
   const perPersona: RunBatchResult["perPersonaSummary"] = [];
+  // Honor an explicit mode (live | scripted-multi). When the caller passed
+  // mode: "live" via runBatchCommand we drive each persona through a real
+  // agent-browser session in turn. Scripted-multi is the fast deterministic
+  // fallback.
+  const inheritedMode = opts.mode === "live" ? "live" : "scripted-multi";
   for (const personaRecord of personas) {
     const r = await runCommand({
       ...opts,
-      mode: "scripted-multi",
+      mode: inheritedMode,
       runsRoot,
       personaIdOverride: personaRecord.id,
     });
@@ -105,6 +110,16 @@ export const runBatchCommand = async (opts: RunCommandOpts): Promise<RunBatchRes
       findings: r.findings.length,
       severities: r.findings.map((f) => f.severity),
     });
+    // Stamp every run with a batch.json so the dashboard can group them.
+    try {
+      const fs = await import("node:fs");
+      fs.writeFileSync(
+        join(r.runDir, "batch.json"),
+        JSON.stringify({ batchId, personaIndex: runs.length - 1, totalPersonas: personas.length }, null, 2),
+      );
+    } catch {
+      // best-effort; batch grouping degrades gracefully
+    }
   }
   return { batchId, runs, perPersonaSummary: perPersona };
 };

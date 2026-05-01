@@ -18,6 +18,8 @@ export type RunSummary = {
   reportPath: string;
   label?: string;
   scenario?: string;
+  batchId?: string;
+  personaIndex?: number;
 };
 
 export const runsRoot = (): string => RUNS_ROOT;
@@ -53,6 +55,19 @@ export const listRuns = (): RunSummary[] => {
         else if (url.includes("localhost:3100")) scenario = "local-checkout";
         else if (url.startsWith("https://")) scenario = "external-live";
       }
+      // Batch grouping
+      const batchPath = join(RUNS_ROOT, id, "batch.json");
+      let batchId: string | undefined;
+      let personaIndex: number | undefined;
+      if (existsSync(batchPath)) {
+        try {
+          const tag = JSON.parse(readFileSync(batchPath, "utf8"));
+          batchId = tag.batchId;
+          personaIndex = tag.personaIndex;
+        } catch {
+          // ignore
+        }
+      }
       out.push({
         id,
         status: data.status ?? "unknown",
@@ -65,6 +80,8 @@ export const listRuns = (): RunSummary[] => {
         reportPath: `/.personabench/runs/${id}/report.html`,
         label,
         scenario,
+        batchId,
+        personaIndex,
       });
     } catch {
       // skip unreadable run dir
