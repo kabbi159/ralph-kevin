@@ -18,14 +18,14 @@ total=$((deadline_ts - start_ts))
 if [ "$remaining" -le 0 ]; then
   status="DEADLINE PASSED — 즉시 마무리하고 정리하세요"
   rh=0; rm_=0
+elif [ "$remaining" -le 600 ]; then
+  rh=$((remaining / 3600))
+  rm_=$(((remaining % 3600) / 60))
+  status="CRITICAL — 10분 이하 남음. 신규 기능 중단, 통합/검증/커밋만"
 elif [ "$remaining" -le 1800 ]; then
   rh=$((remaining / 3600))
   rm_=$(((remaining % 3600) / 60))
-  status="CRITICAL — 30분 이하 남음. 신규 기능 중단, 통합/검증/커밋만"
-elif [ "$remaining" -le 3600 ]; then
-  rh=$((remaining / 3600))
-  rm_=$(((remaining % 3600) / 60))
-  status="WARNING — 1시간 이하 남음. 핵심 기능 마무리 우선"
+  status="WARNING — 30분 이하 남음. 핵심 기능 마무리 우선"
 else
   rh=$((remaining / 3600))
   rm_=$(((remaining % 3600) / 60))

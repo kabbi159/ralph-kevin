@@ -4,18 +4,40 @@
 
 Run persona agents through a target URL and produce replay-backed UX findings.
 
+## Browser substrate
+
+PersonaBench's runner is built on **`agent-browser`** (Vercel Labs, npm: `agent-browser`). The runner spawns the CLI as a long-lived daemon for each run, addressing it via `--session <runId>`. Browser primitives map one-to-one onto agent-browser commands:
+
+| PersonaBench primitive | agent-browser command |
+|---|---|
+| start session, navigate | `agent-browser --session <id> open <url>` |
+| observe page | `agent-browser --session <id> snapshot --json` |
+| click element | `agent-browser --session <id> click @<ref>` |
+| type into input | `agent-browser --session <id> fill @<ref> "<text>"` |
+| scroll | `agent-browser --session <id> scroll <direction>` |
+| go back | `agent-browser --session <id> back` |
+| screenshot | `agent-browser --session <id> screenshot <path>` |
+| trace | `agent-browser --session <id> trace start \| stop` |
+| close session | `agent-browser --session <id> close` |
+
+Snapshots return a structured accessibility tree with stable element refs (`e1`, `e2`, …). The runner stores the snapshot verbatim under `.personabench/runs/<runId>/observations/<step>.json` and feeds a compacted version to the `DecisionProvider`.
+
+The runner does **not** use `agent-browser chat`. That command depends on the Vercel AI Gateway and uses a fixed system prompt, which is incompatible with PersonaBench's persona-injection design. Persona-aware decisions go through a `DecisionProvider` interface (default: `ClaudeDecisionProvider` calling the Anthropic SDK with `claude-haiku-4-5-20251001`).
+
 ## Runner loop
 
 ```txt
-open target URL
-  -> observe page
-  -> summarize visible state
-  -> decide next action as persona
-  -> execute action
-  -> log event
-  -> capture screenshot if needed
-  -> detect stop condition
-  -> repeat
+agent-browser --session <runId> open <targetUrl>
+loop until stop:
+  observation := agent-browser --session <runId> snapshot --json
+  -> compact observation (visible text + interactive refs + screenshot path)
+  -> decision := DecisionProvider.decide({ observation, persona, task, recentHistory })
+  -> safety check (allowlist, payment block, destructive block)
+  -> execute via the corresponding agent-browser command
+  -> capture screenshot via `agent-browser screenshot`
+  -> log RunEvent (observation, action, result, thoughtSummary)
+  -> detect stop condition (maxActions, maxDurationSec, action.type === "stop", safety violation)
+agent-browser --session <runId> close
 ```
 
 ## Run config

@@ -31,14 +31,19 @@ If using a mock persona, clearly name it `mock_*` and never present it as data-g
 
 - TypeScript
 - pnpm workspaces
-- Playwright
+- **`agent-browser`** (Vercel Labs) — primary browser automation substrate. Provides accessibility-tree snapshots with stable element refs (`@e1`, `@e2`, …), a single Chrome-for-Testing binary auto-installed under `~/.agent-browser/browsers/`, headless-by-default, built-in `screenshot` / `trace` / `--allowed-domains` flags, and `--json` structured output. The runner shells out to `agent-browser` via subprocess for `open / snapshot / click / fill / press / scroll / screenshot / close`; it does **not** use `agent-browser chat` (which depends on Vercel AI Gateway) — persona-aware decisions stay in our own `DecisionProvider` calling the Anthropic SDK directly with the AGENTS.md persona prompt block.
+- Anthropic SDK — `claude-haiku-4-5-20251001` for the runner's per-step `DecisionProvider`; `claude-sonnet-4-6` for finding/interview/fix-prompt generation.
 - Next.js (App Router) — both `report.html` static rendering and the served web app
 - Tailwind
 - shadcn/ui
-- DuckDB — primary parquet query engine for `LocalParquetNemotronSource`
+- DuckDB — primary parquet query engine for `LocalParquetNemotronSource` (use `@duckdb/node-api`, not the legacy `duckdb` npm package)
 - File-based storage — all run state under `.personabench/runs/<runId>/...`
 - Python helper for Hugging Face dataset streaming (used by the HF source adapter)
 - The hosted product (separate commercialization track) uses Postgres + pgvector + a separate API server. Do not provision those during this build — they belong to the hosted track in `docs/11_OPEN_SOURCE_AND_ENTERPRISE_SPLIT.md`.
+
+### Why `agent-browser` instead of raw Playwright
+
+`agent-browser` ships an accessibility tree pre-extracted with element refs, which is exactly the observation shape PersonaBench's friction detector wants. Raw Playwright requires us to re-derive that surface ourselves, plus extra glue for screenshots, traces, and domain allowlists. The CLI surface is small (~20 commands) and stable, the binary is pre-built for arm64 macOS / linux, and the daemon/IPC architecture survives across iteration boundaries. We trade in-process speed for an observation contract that an LLM-backed `DecisionProvider` can consume directly.
 
 ## Repository shape
 
@@ -68,7 +73,7 @@ data/
   personas/             # local Hugging Face dataset cache (gitignored)
 ```
 
-The runner is invoked as a child process from the CLI (`personabench run`) and from the web app's `POST /api/runs` route. There is no separate API server, no worker service, no message queue. Run state lives in `.personabench/runs/<runId>/` so all surfaces (CLI, web, MCP) read from the same source of truth.
+The runner is invoked as a child process from the CLI (`personabench run`) and from the web app's `POST /api/runs` route. The runner itself spawns `agent-browser` as a long-lived daemon (one session per run, identified by `--session <runId>`), drives it through the observe → decide → act loop, and tears it down at end-of-run. There is no separate API server, no worker service, no message queue. Run state lives in `.personabench/runs/<runId>/` so all surfaces (CLI, web, MCP) read from the same source of truth.
 
 ## Coding style
 

@@ -976,9 +976,9 @@ Reads two ISO timestamps (`START_ISO`, `DEADLINE_ISO`), computes elapsed/remaini
 Status thresholds:
 
 ```txt
-remaining > 1h        -> active
-remaining <= 1h       -> WARNING (핵심 기능 마무리 우선)
-remaining <= 30m      -> CRITICAL (신규 기능 중단, 통합/검증/커밋만)
+remaining > 30m       -> active
+remaining <= 30m      -> WARNING (핵심 기능 마무리 우선)
+remaining <= 10m      -> CRITICAL (신규 기능 중단, 통합/검증/커밋만)
 remaining <= 0        -> PASSED (즉시 마무리)
 ```
 
@@ -1028,6 +1028,51 @@ Verify activation by checking that the next prompt's response reflects the injec
 - Hardcoding the deadline as a literal in the loop prompt: changes require restarting the loop. Prefer the hook so the model gets fresh time on every iteration.
 - Using `Stop` hook for time injection: `Stop` runs after the turn ends, too late to influence the work that just happened.
 - Skipping the `/hooks` reload: a silent watcher means the hook never fires and the agent has no time awareness.
+
+### Demo integrity gates (G1–G4)
+
+The time-budget hook protects against time *underrun*. These gates protect against time *overrun masquerading as completion* — i.e., the loop running out of new tasks while the demo is silently broken. The loop must not declare the demo path complete until G1, G2, G3, and G4 are all green. They are checked once per iteration after any change to the demo path (analyzer, CLI, example app, report, web app, or distribution).
+
+- **G1 — Friction surface lives.** A single run of `personabench run --config examples/run-config.checkout.json` on `examples/ecommerce-checkout` produces ≥3 `FrictionSignal` entries and ≥1 `UXFinding` with severity `high` or `critical`. This is evidence that the example app's intentional UX flaws are still triggering detection — without it, the demo is empty even if all unit tests pass.
+- **G2 — Fix loop closes.** Apply the generated `fix-prompts/F-001.md` to `examples/ecommerce-checkout` (the loop applies it itself), rerun, then `personabench compare <runA> <runB>`. The previously-failing finding must appear under `resolved`. Without this, "fix prompts" is theatre.
+- **G3 — One-command demo.** `pnpm personabench demo` (a single composite script the bootstrap creates) brings up the example app on port 3100, runs `personabench run` against it, generates `report.html`, and opens it — start to finish in ≤2 minutes. Without this, the live demonstration becomes an exercise in juggling four terminals.
+- **G4 — Clone-and-install distribution.** PersonaBench must be usable from any directory and any external Claude Code / Codex session by cloning this repo and running `pnpm install && pnpm -r build && pnpm personabench install`. npm publishing is not available in this build environment (corporate hackathon security restriction). Sub-gates:
+  - **G4-a.** `packages/cli/package.json` declares `"bin": {"personabench": "dist/bin.js"}`. `pnpm personabench install` runs `pnpm -F @personabench/cli link --global` so `personabench --version` exits 0 from any working directory.
+  - **G4-b.** `personabench install` adds an idempotent `mcpServers.personabench` entry to `~/.claude/settings.json` (preserving other keys); after restart, an external Claude Code session can call `run_persona_ux_test`.
+  - **G4-c.** `personabench install` symlinks `plugins/claude-code/` into `~/.claude/plugins/personabench/`. The `--codex` flag opts into a parallel Codex skill install.
+  - **G4-d.** `personabench uninstall` reverses G4-a/b/c cleanly so a developer can remove the install without leaving artifacts in a corporate-managed environment.
+  - **G4-e.** Verification scenario: in a fresh `mktemp -d`, `personabench --version`, `personabench run --help`, and `personabench mcp --help` all exit 0. `personabench uninstall` then leaves `~/.claude/settings.json` and `~/.claude/plugins/` as they were before install.
+
+If any gate is red the loop's next iteration must be a repair iteration on the gate, not new feature work. Repair iterations follow Pattern A unless safety-auditor or dataset-validator territory is touched.
+
+### Stretch queue (S1–S10) when time-budget remains `active`
+
+If the demo path is green (G1–G3 pass) and the time-budget hook is still `active`, the loop pulls from this ordered queue. Top of queue first; do not skip ahead. Items below the active item exist; items above it are done. The queue is appended to `.ralph/stretch-queue.md` at bootstrap and updated on each completion.
+
+1. **S1 — Before/after compare on a real fix.** Apply a fix prompt by hand-editing `examples/ecommerce-checkout`, rerun, render `compare.html`. This is the dogfood demo — by far the highest-impact addition.
+2. **S2 — Multi-persona run.** Three to five different Korean personas run against the same flow in one invocation; each produces a distinct friction trace. Verifies sampling diversity.
+3. **S3 — Live web run.** `/runs/:runId` polls and shows live step counter + latest event line; on completion the page flips to replay viewer (trace.zip embedded) + finding cards.
+4. **S4 — Persona pack save/reuse.** Search on `/personas` → "Save as pack" → on `/runs/new` reuse the saved pack as the persona source.
+5. **S5 — MCP smoke.** A second Claude Code session connects to `pnpm personabench mcp` and successfully invokes `run_persona_ux_test`.
+6. **S6 — Locale-agnostic proof.** A one-row English NDJSON fixture loaded through `LocalJsonPersonaSource` runs end-to-end. No code change required.
+7. **S7 — CI workflow.** `.github/workflows/ci.yml` runs `pnpm install && pnpm -r build && pnpm -r typecheck && pnpm -r test` on a clean ubuntu-latest runner.
+8. **S8 — README quickstart.** Top-level `README.md` with install command, `pnpm personabench demo` invocation, and one screenshot of `report.html`.
+9. **S9 — `report.html` snapshot.** Byte-stable snapshot test for a fixture run; future regressions surface in CI.
+10. **S10 — rrweb / video.** Wire up the deferred Phase 4 recorder paths if (and only if) all of S1–S9 are committed.
+
+### Forbidden during `active` (even with time to spare)
+
+Time left does not mean license to roam. The following are off-limits even when the time-budget hook is green:
+
+- Refactor, rename, or reorganize anything not directly required by an open task or stretch queue item.
+- Introduce new packages or tooling not declared in this guide (no turbo, nx, changesets, husky, jest, eslint, prettier, mocha, pnpm-deploy, etc.).
+- Implement any hosted-track feature from `docs/11_OPEN_SOURCE_AND_ENTERPRISE_SPLIT.md` (auth, multi-tenant, pgvector, separated API server, billing).
+- Premature optimization: caching layers, indexing, parallel execution, worker pools.
+- Try a different LLM model (only `claude-haiku-4-5-20251001` for runtime decisions and `claude-sonnet-4-6` for analyzer reasoning are sanctioned).
+- Add abstractions, interfaces, or extension points "for the future."
+- Write code without tests (the only exception is documentation and the example app's deliberately-flawed UI).
+
+If the loop catches itself wanting to do one of the above, the right move is to pull the next item from the stretch queue or, if S10 is done, commit a `chore(ralph): stretch queue exhausted` marker and idle until the time-budget transitions out of `active`.
 
 ---
 
@@ -1245,6 +1290,8 @@ Ralph Mode is successful when:
 - safety rules are implemented for browser runner
 - AGENTS.md and docs reflect current architecture
 - git history shows task-by-task progress
+- demo integrity gates G1, G2, G3, G4 (§17 "Demo integrity gates") all pass
+- if time-budget remained `active` after the demo path closed, stretch queue items S1..Sn are committed in order with no skips
 ```
 
 ---
@@ -1462,6 +1509,17 @@ Earlier drafts of this guide explored Codex parallelism. For PersonaBench:
 - recovery from a stuck iteration is one-tree-walk, not two
 
 If a future build wants multi-CLI parallelism, the lane-based design is reconstructible from this guide's git history — but it is intentionally not part of the active plan.
+
+### 24.5b Sub-agent budget cap
+
+Sub-agents are not free. Each `phase-tester`, `spec-reviewer`, `safety-auditor`, and `dataset-validator` invocation consumes its own context window plus the main thread's tokens to brief and digest the response. To prevent Pattern C from devouring the iteration budget on a single phase:
+
+- A single phase boundary may consult sub-agents at most **four times in total** across all four agent types. The most common shape is `phase-tester` (run) → main thread (fix) → `phase-tester` (re-run) → `spec-reviewer` (audit), totalling three; the fourth slot is reserved for `safety-auditor` or `dataset-validator` when the phase touched their territory.
+- If after the fourth call the phase still cannot be signed off, the main thread takes over: it reads the failures itself, fixes them, runs the declared test command directly, and either commits the phase-complete tag or downgrades the offending feature into the `.ralph/spec-changes.md` log per the self-bypass policy in the loop prompt.
+- The cap applies per phase, not per iteration. A phase that spans multiple iterations still gets only four sub-agent calls in total at its boundary.
+- `Explore` and `Plan` (built-in, used in Pattern B) are not counted against this cap; they are research tools, not verification gates.
+
+This rule deliberately favors progress over thoroughness near phase boundaries. The time-budget hook does the same at session boundaries, so the two budgets compose.
 
 ### 24.6 Observability
 

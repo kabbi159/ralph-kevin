@@ -120,27 +120,31 @@ Create:
 ```txt
 packages/runner/src/
   runPersonaTest.ts
-  browser/
-  observe/
-  decide/
-  act/
+  browser/         # agent-browser subprocess driver
+  observe/         # snapshot --json parser; produces compact observation
+  decide/          # DecisionProvider implementations
+  act/             # agent-browser command translator
   safety/
 ```
 
 Implement:
 
-- Playwright browser lifecycle (launch → navigate → close)
-- page observation (DOM snapshot + accessibility tree + screenshot)
-- action execution (click, type, scroll, wait)
+- `agent-browser` subprocess lifecycle (`open <url> --session <runId>` → … → `close`)
+  - one daemon per run; `--session <runId>` namespaces concurrent runs
+  - subprocess stdout/stderr piped to `events.ndjson` `agent_browser_io` lines for replay
+  - graceful shutdown on signal so no chrome process is leaked
+- page observation: `agent-browser snapshot --json` parsed into `{ origin, snapshot, refs }` and compacted (drop nested generics, keep interactive refs + visible text + price/error tokens)
+- action execution: AgentAction → agent-browser command (`click @<ref>` / `fill @<ref> "<text>"` / `scroll <direction>` / `back` / `wait` / `stop`)
 - event logging (each observation/action/decision emits a `RunEvent`)
-- `maxDurationSec` and `maxActions` enforcement
-- `domain allowlist` enforcement
-- safety policies (block payment submission, redact sensitive selectors)
+- `maxDurationSec` and `maxActions` enforcement (the runner times out the subprocess if a single command stalls; per-run deadline is the outer guard)
+- `domain allowlist` enforcement: pass `--allowed-domains` to `agent-browser open`, **and** double-check `observation.origin` after every snapshot — a redirect outside the allowlist halts the run with `safety_violation`
+- safety policies (block payment submission, block destructive selectors, redact sensitive fields before logging)
+- viewport: pass `--viewport <name|wxh>` to `agent-browser open`
 
 `decide` uses a `DecisionProvider` interface. Ship two implementations:
 
 - `MockDecisionProvider` for tests (deterministic action plans)
-- `ClaudeDecisionProvider` for real runs (Anthropic SDK)
+- `ClaudeDecisionProvider` for real runs — calls the Anthropic SDK directly with the persona prompt block + compacted observation; returns an `AgentAction`. Default model: `claude-haiku-4-5-20251001`. **Does not** use `agent-browser chat`.
 
 ```ts
 interface DecisionProvider {
@@ -150,15 +154,17 @@ interface DecisionProvider {
 
 Tests:
 
-- launch + close lifecycle produces no leaked browser process
-- action execution against `examples/ecommerce-checkout` performs each action type
+- open + close lifecycle: no orphan agent-browser daemon and no orphan chrome process
+- snapshot parser: a fixture `agent-browser snapshot --json` payload is parsed into the compacted observation shape and round-trips with no dropped refs
+- action execution against `examples/ecommerce-checkout` performs each action type via agent-browser
 - `maxDurationSec`: run terminates at deadline with `stopReason: timeout`
 - `maxActions`: run terminates after the cap with `stopReason: action_limit`
-- domain allowlist: navigation outside the allowlist halts run with `safety_violation` event
+- domain allowlist: a redirect to `evil.example.com` halts the run with `safety_violation`
 - payment-submit attempt is blocked and logged as `payment_blocked`
-- screenshot saved per observation step
+- screenshot saved per observation step (via `agent-browser screenshot`)
 - event log roundtrips through `RunEventSchema`
 - `MockDecisionProvider` runs the deterministic plan end-to-end against a fixture HTML page
+- live-site smoke (manual): a one-action run against `https://crack.wrtn.ai/` produces a snapshot with ≥100 element refs and a saved screenshot — see `examples/run-config.crack.json`
 
 Sub-agents at boundary: `phase-tester`, `spec-reviewer`, `safety-auditor`.
 
@@ -262,6 +268,9 @@ personabench rerun
 personabench compare
 personabench serve            # launches the web app
 personabench mcp              # launches the MCP server
+personabench demo             # one-command demo (G3 in the Ralph guide)
+personabench install          # clone-and-install distribution (G4 in the Ralph guide)
+personabench uninstall        # reverses install cleanly
 ```
 
 Tests:
@@ -275,6 +284,9 @@ Tests:
 - `personabench compare A B` writes `compare.html` and exits 0
 - non-zero exit codes on failure paths (missing run, invalid URL, allowlist violation in config)
 - redaction behavior preserved at CLI layer (no plaintext secret in stdout/stderr)
+- `personabench demo` boots `examples/ecommerce-checkout` on port 3100, runs a sample, generates `report.html`, and opens it — start to finish in ≤2 minutes (this is gate G3 in the Ralph guide §17 "Demo integrity gates")
+- `personabench install` runs `pnpm -F @personabench/cli link --global`, adds an idempotent `mcpServers.personabench` entry to `~/.claude/settings.json`, and symlinks `plugins/claude-code/` into `~/.claude/plugins/personabench/`. After install, `personabench --version` exits 0 from a fresh `mktemp -d` (this is gate G4 in the Ralph guide §17). `--codex` flag also installs the Codex skill. `personabench uninstall` reverses every step.
+- `personabench install` is idempotent: running it twice produces no duplicate `mcpServers` keys or duplicate plugin links.
 
 Sub-agents at boundary: `phase-tester`, `spec-reviewer`.
 
@@ -423,11 +435,14 @@ After Phase 11 completes, one final iteration:
 
 1. Run all phase-tester reports back-to-back (Phases 0..11) to confirm no cross-phase regression
 2. Run `safety-auditor` over the entire codebase, not just runner/recorder
-3. Run a full demo flow end-to-end (CLI path + Web path) against `examples/ecommerce-checkout`
-4. Generate a fresh `report.html` and a `compare.html` for two runs
-5. Tag the final commit `release/personabench-v0.1`
+3. Confirm demo integrity gates G1, G2, G3 (Ralph guide §17) all pass on the current commit
+4. Run a full demo flow end-to-end (CLI path + Web path) against `examples/ecommerce-checkout`
+5. Generate a fresh `report.html` and a `compare.html` for two runs
+6. Tag the final commit `release/personabench-v0.1`
 
-This iteration is Pattern C with all four sub-agents (`phase-tester`, `spec-reviewer`, `safety-auditor`, `dataset-validator`) consulted in turn.
+This iteration is Pattern C with all four sub-agents (`phase-tester`, `spec-reviewer`, `safety-auditor`, `dataset-validator`) consulted in turn, subject to the per-phase sub-agent budget cap defined in Ralph guide §24.5b.
+
+If the time-budget hook is still in `active` after this final integration commit, work proceeds in stretch-queue order (Ralph guide §17 "Stretch queue S1–S10") rather than starting any new feature outside that queue.
 
 ---
 

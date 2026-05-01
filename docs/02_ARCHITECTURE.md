@@ -82,13 +82,18 @@ Everything related to persona data:
 
 ### `packages/runner`
 
-Browser execution:
+Browser execution. **Substrate: `agent-browser` (Vercel Labs).** The runner spawns `agent-browser` as a subprocess daemon per run (`--session <runId>`), and drives it via the structured-JSON command surface:
 
-- Playwright lifecycle
-- observe/decide/act loop
-- viewport/auth config
-- timeout/action limits
-- safe action policies
+- session lifecycle (`agent-browser open <url>` / `close`)
+- observe (`agent-browser snapshot --json` → accessibility tree + element refs)
+- act (`agent-browser click @e3 / fill @e5 "..." / scroll / press / hover`)
+- screenshot (`agent-browser screenshot <path>`) and trace (`agent-browser trace start/stop`) for replay
+- viewport / mobile emulation via `--viewport`
+- domain allowlist via `--allowed-domains`
+- timeout / max-actions limits enforced by the runner around each subprocess call
+- safe action policy (block payment submit, block destructive selectors) checked before each `click` / `fill`
+
+Persona-aware decision-making (per-step "what would this 19-year-old new user do next?") is handled by a separate `DecisionProvider` interface that calls the Anthropic SDK directly (`claude-haiku-4-5-20251001`). The runner does **not** use `agent-browser chat` because that command depends on the Vercel AI Gateway and has a fixed system prompt incompatible with persona injection.
 
 ### `packages/recorder`
 

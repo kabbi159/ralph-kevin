@@ -81,7 +81,7 @@ Acceptance:
 
 ### 3. Browser runner
 
-Use Playwright to run a persona through a URL.
+Use **`agent-browser`** (Vercel Labs) as the browser substrate. The runner spawns `agent-browser` as a per-run subprocess daemon (`--session <runId>`) and drives it through the observe/decide/act loop. Persona-aware decisions are made by a `DecisionProvider` interface backed by the Anthropic SDK (`claude-haiku-4-5-20251001` by default). The runner does **not** use `agent-browser chat` — see `docs/04_RUNNER_ANALYZER_SPEC.md` "Browser substrate" for details.
 
 Acceptance:
 
@@ -91,6 +91,7 @@ Acceptance:
 - logs observations and actions
 - stores screenshots
 - records trace/video if configured
+- can be pointed at any HTTPS URL on the configured domain allowlist (e.g., a local example app at `http://localhost:3100/checkout`, or an external site like `https://crack.wrtn.ai/` when allowlisted)
 
 ### 4. Friction detector
 
@@ -143,7 +144,14 @@ personabench rerun
 personabench compare
 personabench serve            # launches the web app
 personabench mcp              # launches the MCP server
+personabench demo             # one-command demo: starts examples/ecommerce-checkout, runs a sample test, opens report.html
+personabench install          # registers CLI globally + MCP entry + plugin symlinks (no npm publish)
+personabench uninstall        # reverses install cleanly
 ```
+
+The `demo` command is the dress-rehearsal entrypoint: `pnpm personabench demo` must complete in ≤2 minutes from a clean checkout (with the dataset cache present) and must not require any other terminal session, configuration prompt, or argument. It is the load-bearing gate for the live demonstration — see `docs/08_IMPLEMENTATION_PLAN.md` and the Ralph guide §17 "Demo integrity gates" for the test contract.
+
+The `install` command is the **clone-and-install distribution path**: this build cannot rely on `npm publish` (security-restricted environment), so PersonaBench is delivered as a git clone. After `pnpm install && pnpm -r build`, running `pnpm personabench install` registers the CLI globally via `pnpm link --global`, adds an `mcpServers.personabench` entry to `~/.claude/settings.json`, and symlinks `plugins/claude-code/` into `~/.claude/plugins/personabench/`. After this, any external Claude Code or Codex session can call `personabench` and `run_persona_ux_test` without further setup. `personabench uninstall` reverses each step. Contract details: Ralph guide §17 gate G4.
 
 ### 8. Local report (`report.html`)
 
