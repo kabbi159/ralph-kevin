@@ -17,7 +17,5 @@
     "packages/runner/src/safety/redact.ts",
     "packages/runner/src/__tests__/safety-policy.test.ts"
   ],
-  "depends": [
-    "TASK-022"
-  ]
+  "depends": ["TASK-022"]
 }

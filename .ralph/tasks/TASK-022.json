@@ -17,7 +17,5 @@
     "packages/runner/src/decide/claude-decision-provider.ts",
     "packages/runner/src/__tests__/decision-provider.test.ts"
   ],
-  "depends": [
-    "TASK-021"
-  ]
+  "depends": ["TASK-021"]
 }

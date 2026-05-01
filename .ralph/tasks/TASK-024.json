@@ -2,7 +2,7 @@
   "id": "TASK-024",
   "phase": "P3",
   "title": "runPersonaTest orchestrator (observe → decide → act loop, event log)",
-  "status": "pending",
+  "status": "completed",
   "pattern": "B",
   "acceptance": [
     "packages/runner/src/run-persona-test.ts: runPersonaTest({ runId, personaProfile, config, decisionProvider, browser }) → { stopReason, eventCount }",
@@ -16,5 +16,7 @@
     "packages/runner/src/event-log.ts",
     "packages/runner/src/__tests__/run-persona-test.test.ts"
   ],
-  "depends": ["TASK-023"]
+  "depends": [
+    "TASK-023"
+  ]
 }
