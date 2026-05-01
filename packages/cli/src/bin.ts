@@ -86,7 +86,8 @@ const main = async (): Promise<void> => {
       | "scripted-postfix"
       | "scripted-multi"
       | "live";
-    const result = await runCommand({ configPath, mode });
+    const lang = (flag("--lang") ?? "auto") as "ko" | "en" | "auto";
+    const result = await runCommand({ configPath, mode, lang });
     console.log(`run id:    ${result.runId}`);
     console.log(`run dir:   ${result.runDir}`);
     console.log(`signals:   ${result.signalCount}`);

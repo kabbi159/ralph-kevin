@@ -29,6 +29,10 @@ export type RunCommandOpts = {
   personaIdOverride?: string;
   // For scripted-multi: how many personas to run. Default 3.
   count?: number;
+  // Output language for findings + interview + report. Defaults to 'ko'
+  // (Korean) for the verified persona dataset; 'auto' infers from
+  // persona.locale.language; 'en' forces English.
+  lang?: "ko" | "en" | "auto";
 };
 
 export type RunCommandResult = {
@@ -161,6 +165,13 @@ export const runCommand = async (opts: RunCommandOpts): Promise<RunCommandResult
   writeFileSync(join(runDir, "friction-signals.json"), JSON.stringify(signals, null, 2));
 
   // 5. Aggregate → findings.json (+ fix-prompts/F-NNN.md).
+  const optsLang = opts.lang;
+  const resolvedLang: "ko" | "en" =
+    optsLang === "ko" || optsLang === "en"
+      ? optsLang
+      : personaRecord.locale.language === "en"
+        ? "en"
+        : "ko";
   const findings = aggregateFindings({
     signals,
     events,
@@ -168,6 +179,7 @@ export const runCommand = async (opts: RunCommandOpts): Promise<RunCommandResult
     runId,
     targetUrl: config.targetUrl,
     task: config.task,
+    lang: resolvedLang,
   });
   writeFileSync(join(runDir, "findings.json"), JSON.stringify(findings, null, 2));
   for (const f of findings) {

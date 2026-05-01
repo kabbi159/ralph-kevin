@@ -148,18 +148,33 @@ describe("renderFixPrompt", () => {
     const finding = findings[0];
     expect(finding).toBeDefined();
     if (!finding) return;
-    const md = renderFixPrompt({
+    const mdEn = renderFixPrompt({
       finding,
       persona,
       targetUrl: "http://localhost:3100/checkout",
       task: "Complete checkout",
       signalTypes: ["price_uncertainty"],
+      lang: "en",
     });
-    expect(md).toContain("# UX Fix Task:");
-    expect(md).toContain("## Evidence");
-    expect(md).toContain("## Required fix");
-    expect(md).toContain("## Acceptance criteria");
-    expect(md).toContain("Rerun PersonaBench");
+    expect(mdEn).toContain("# UX Fix Task:");
+    expect(mdEn).toContain("## Evidence");
+    expect(mdEn).toContain("## Required fix");
+    expect(mdEn).toContain("## Acceptance criteria");
+    expect(mdEn).toContain("Rerun PersonaBench");
+
+    const mdKo = renderFixPrompt({
+      finding,
+      persona,
+      targetUrl: "http://localhost:3100/checkout",
+      task: "Complete checkout",
+      signalTypes: ["price_uncertainty"],
+      lang: "ko",
+    });
+    expect(mdKo).toContain("# UX 수정 작업:");
+    expect(mdKo).toContain("## 증거");
+    expect(mdKo).toContain("## 필요한 수정");
+    expect(mdKo).toContain("## 수용 기준");
+    expect(mdKo).toContain("PersonaBench");
   });
 });
 

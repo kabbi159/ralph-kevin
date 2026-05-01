@@ -21,6 +21,9 @@ export type AggregateOpts = {
   runId: string;
   targetUrl: string;
   task: string;
+  // Default 'ko' — the persona dataset locked in for this build is
+  // nvidia/Nemotron-Personas-Korea. Pass 'en' for English reports.
+  lang?: "ko" | "en";
 };
 
 const TITLE_BY_TYPE: Record<FrictionSignalType, string> = {
@@ -37,10 +40,67 @@ const TITLE_BY_TYPE: Record<FrictionSignalType, string> = {
   trust_uncertainty: "신뢰성 / 환불 정책 우려로 멈칫거림",
 };
 
-const RECOMMENDATION_BY_TYPE: Record<
-  FrictionSignalType,
-  { uxChange: string; criteria: string[]; implementationHint?: string }
-> = {
+type Lang = "ko" | "en";
+
+type Recommendation = { uxChange: string; criteria: string[]; implementationHint?: string };
+
+const RECOMMENDATION_KO: Record<FrictionSignalType, Recommendation> = {
+  long_hesitation: {
+    uxChange:
+      "사용자가 멈칫거리는 지점의 인지 부담을 줄여라 — 다음 단계 어포던스를 더 눈에 띄게 표시하거나 화면을 작은 커밋 단위로 분할하라.",
+    criteria: ["페르소나가 화면 도달 후 5초 안에 다음 단계로 진행한다."],
+  },
+  repeated_click: {
+    uxChange: "클릭 즉시 피드백을 보여라 — 첫 클릭 후 컨트롤을 비활성화하고 진행 상태를 표시하라.",
+    criteria: ["같은 컨트롤을 두 번 클릭해도 부작용이 중복되지 않는다."],
+  },
+  dead_click: {
+    uxChange: "클릭에 반응하도록 만들거나, 버튼처럼 보이는 시각적 어포던스를 제거하라.",
+    criteria: [
+      "클릭한 요소는 200ms 안에 가시적 상태 변화를 보이거나 더 이상 버튼처럼 보이지 않는다.",
+    ],
+  },
+  backtrack: {
+    uxChange: "이전 화면이 맥락을 유지하도록 하여 사용자가 되돌아가지 않게 하라.",
+    criteria: ["뒤로 가기 후 다시 돌아왔을 때 폼 값과 스크롤 위치가 보존된다."],
+  },
+  form_error: {
+    uxChange:
+      "사용자가 타이핑하는 동안 인라인 검증을 보여라; 비활성화된 제출 버튼은 그 이유를 명시해야 한다.",
+    criteria: ["비활성화된 제출 버튼은 누락된 필드를 명시하는 툴팁/인라인 메시지를 표시한다."],
+  },
+  scroll_search: {
+    uxChange: "모바일에서는 주요 액션과 합계를 뷰포트 하단에 고정하라.",
+    criteria: ["사용자가 한 번 이상 스크롤하지 않고도 다음 CTA를 찾는다."],
+  },
+  task_abandonment: {
+    uxChange: "드롭오프의 직접 원인을 찾아 해결하라.",
+    criteria: ["페르소나가 작업을 포기하지 않고 성공 상태에 도달한다."],
+  },
+  cta_not_found: {
+    uxChange: "주요 CTA를 화면에서 가장 대비가 강한 요소로 만들어라.",
+    criteria: ["페르소나가 화면 도달 후 3초 안에 주요 CTA를 식별한다."],
+  },
+  copy_confusion: {
+    uxChange: "모호한 문구를 평이한 언어로 다시 써라.",
+    criteria: ["페르소나가 다음 단계의 동작을 자신의 말로 다시 설명할 수 있다."],
+  },
+  price_uncertainty: {
+    uxChange:
+      "정확한 최종 합계를 표시하라. '약/approximately/~' 접미사를 제거하라. 배송비와 기타 수수료를 합계 위 항목으로 노출하라.",
+    criteria: [
+      "표시된 합계가 페르소나에게 실제로 청구될 금액과 일치한다.",
+      "배송/서비스/쿠폰 조정 항목이 모두 합계 위에 별도 라인으로 표시된다.",
+    ],
+    implementationHint: "'약 ~원' 래퍼를 제거하고 배송 정보 패널을 기본으로 펼쳐라.",
+  },
+  trust_uncertainty: {
+    uxChange: "결제 단계 근처에 환불/취소 정책 링크를 노출하라.",
+    criteria: ["페르소나가 체크아웃 흐름을 떠나지 않고도 환불 정책을 찾을 수 있다."],
+  },
+};
+
+const RECOMMENDATION_EN: Record<FrictionSignalType, Recommendation> = {
   long_hesitation: {
     uxChange:
       "Reduce the cognitive load at the hesitation point — surface the next-step affordance more visibly, or break the screen into smaller commits.",
@@ -99,8 +159,20 @@ const RECOMMENDATION_BY_TYPE: Record<
   },
 };
 
+const recommendationsFor = (lang: Lang) => (lang === "en" ? RECOMMENDATION_EN : RECOMMENDATION_KO);
+
+const goalLabel = (lang: Lang, task: string) =>
+  lang === "en" ? `Complete the task: "${task}"` : `다음 작업을 완료한다: "${task}"`;
+
+const summaryFor = (lang: Lang, title: string, count: number): string =>
+  lang === "en"
+    ? `${title} (${count} signal${count > 1 ? "s" : ""}).`
+    : `${title} (신호 ${count}개).`;
+
 export const aggregateFindings = (opts: AggregateOpts): UXFinding[] => {
   const { signals, events, persona, runId, targetUrl, task } = opts;
+  const lang: Lang = opts.lang ?? (persona.sourceProvenance.dataset.includes("USA") ? "en" : "ko");
+  const recsByType = recommendationsFor(lang);
   const byType = new Map<FrictionSignalType, FrictionSignal[]>();
   for (const s of signals) {
     const list = byType.get(s.type) ?? [];
@@ -121,7 +193,7 @@ export const aggregateFindings = (opts: AggregateOpts): UXFinding[] => {
     const screenshots = Array.from(new Set(group.flatMap((s) => s.evidence.screenshotPaths ?? [])));
     const timestamps = group.map((s) => new Date(s.timestampStartMs).toISOString());
     const severity = severityFor(group);
-    const rec = RECOMMENDATION_BY_TYPE[type];
+    const rec = recsByType[type];
     const titleBase = TITLE_BY_TYPE[type];
 
     const finding: UXFinding = {
@@ -129,7 +201,7 @@ export const aggregateFindings = (opts: AggregateOpts): UXFinding[] => {
       runId,
       severity,
       title: titleBase,
-      summary: `${titleBase} (${group.length} signal${group.length > 1 ? "s" : ""}).`,
+      summary: summaryFor(lang, titleBase, group.length),
       persona: { id: persona.personaId, displayName: persona.displayName },
       evidence: {
         timestamps,
@@ -138,7 +210,7 @@ export const aggregateFindings = (opts: AggregateOpts): UXFinding[] => {
         screenshots: screenshots.length > 0 ? screenshots : undefined,
       },
       diagnosis: {
-        userGoal: `Complete the task: "${task}"`,
+        userGoal: goalLabel(lang, task),
         observedBehavior: group.map((s) => s.evidence.notes).join(" "),
         likelyCause: TITLE_BY_TYPE[type],
         confidence:
@@ -164,6 +236,7 @@ export const aggregateFindings = (opts: AggregateOpts): UXFinding[] => {
       targetUrl,
       task,
       signalTypes: [type],
+      lang,
     });
     findings.push(finding);
     idx++;

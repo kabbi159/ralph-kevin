@@ -1,0 +1,450 @@
+import React from "react";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  Bot,
+  Code2,
+  Database,
+  Eye,
+  GitPullRequestArrow,
+  Globe2,
+  LockKeyhole,
+  PlayCircle,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Video,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const countries = ["Korea", "Japan", "USA", "India", "Singapore", "Brazil", "France"];
+
+const workflow = [
+  {
+    icon: Search,
+    title: "Find your target personas",
+    body: "Search and filter Nemotron-Personas by country, age, region, occupation, behavior traits, and product context.",
+  },
+  {
+    icon: Bot,
+    title: "Run persona agents",
+    body: "AI personas use your product like real target users would — including hesitation, confusion, backtracking, and drop-off.",
+  },
+  {
+    icon: Video,
+    title: "Watch the replay",
+    body: "Every test produces session replay, action logs, friction signals, screenshots, and a grounded post-session interview.",
+  },
+  {
+    icon: Code2,
+    title: "Fix with coding agents",
+    body: "Turn each UX failure into an implementation-ready task for Claude Code, Codex, GitHub Issues, Linear, or Jira.",
+  },
+];
+
+const findings = [
+  {
+    label: "High",
+    title: "Shipping cost uncertainty blocks checkout",
+    quote:
+      "I can see the payment button, but I don’t know the final amount yet. I don’t want to continue until the delivery fee is clear.",
+    evidence: "38s hesitation · 4 repeated clicks · back navigation at 01:12",
+  },
+  {
+    label: "Medium",
+    title: "CTA is visually competing with coupon input",
+    quote:
+      "I thought I had to apply a coupon before I could continue. The next step didn’t feel obvious.",
+    evidence: "Dead click on coupon field · scroll search · CTA ignored twice",
+  },
+];
+
+const personas = [
+  {
+    name: "Korean Checkout Risk Pack",
+    meta: "Korea · Commerce · 8 personas",
+    traits: ["Price-sensitive", "Mobile shopping", "Low patience", "Trust-seeking"],
+  },
+  {
+    name: "Japan Senior Onboarding Pack",
+    meta: "Japan · Signup · 6 personas",
+    traits: ["Detail-oriented", "Risk-averse", "Form cautious", "Help-seeking"],
+  },
+  {
+    name: "India Mobile Payment Pack",
+    meta: "India · Payments · 10 personas",
+    traits: ["Mobile-first", "Cost-aware", "Network constrained", "Fast switching"],
+  },
+];
+
+export default function PersonaBenchLandingPage() {
+  return (
+    <main className="min-h-screen bg-slate-950 text-white">
+      <section className="relative overflow-hidden border-b border-white/10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(56,189,248,0.22),transparent_34%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.20),transparent_30%),radial-gradient(circle_at_50%_80%,rgba(34,197,94,0.12),transparent_32%)]" />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-slate-950 to-transparent" />
+
+        <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-950 shadow-lg shadow-cyan-500/20">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <span className="text-lg font-semibold tracking-tight">PersonaBench</span>
+          </div>
+          <div className="hidden items-center gap-8 text-sm text-slate-300 md:flex">
+            <a href="#product" className="hover:text-white">Product</a>
+            <a href="#developers" className="hover:text-white">Developers</a>
+            <a href="#enterprise" className="hover:text-white">Enterprise</a>
+            <a href="#oss" className="hover:text-white">Open Source</a>
+          </div>
+          <Button className="rounded-full bg-white px-5 text-slate-950 hover:bg-slate-200">
+            Join waitlist
+          </Button>
+        </nav>
+
+        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 pb-24 pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:pb-32 lg:pt-24">
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} transition={{ duration: 0.55 }}>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-cyan-100 backdrop-blur">
+              <Database className="h-4 w-4" />
+              Powered by data-grounded synthetic personas
+            </div>
+
+            <h1 className="max-w-4xl text-5xl font-semibold leading-[1.02] tracking-tight md:text-7xl">
+              Don’t guess. Interview persona agents.
+            </h1>
+
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300 md:text-xl">
+              PersonaBench runs UX tests with synthetic personas from NVIDIA Nemotron-Personas, records where they hesitate or drop off, and turns every UX failure into a fix for your coding agent.
+            </p>
+
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Button size="lg" className="rounded-full bg-cyan-300 px-7 text-slate-950 hover:bg-cyan-200">
+                Run your first UX test
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button size="lg" variant="outline" className="rounded-full border-white/15 bg-white/5 px-7 text-white hover:bg-white/10">
+                View GitHub
+              </Button>
+            </div>
+
+            <div className="mt-10 flex flex-wrap gap-2 text-sm text-slate-400">
+              {countries.map((country) => (
+                <span key={country} className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                  {country}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.12 }}
+            className="relative"
+          >
+            <div className="absolute -inset-6 rounded-[2.5rem] bg-cyan-400/10 blur-3xl" />
+            <Card className="relative overflow-hidden rounded-[2rem] border-white/10 bg-slate-900/80 text-white shadow-2xl shadow-black/40 backdrop-blur">
+              <CardContent className="p-0">
+                <div className="border-b border-white/10 bg-white/[0.03] px-5 py-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-slate-400">Live UX Run</p>
+                      <h3 className="font-semibold">Checkout flow · Korean Persona Pack</h3>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-full bg-emerald-400/10 px-3 py-1 text-sm text-emerald-200">
+                      <PlayCircle className="h-4 w-4" /> Running
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-0 md:grid-cols-[1.2fr_0.8fr]">
+                  <div className="border-b border-white/10 p-5 md:border-b-0 md:border-r">
+                    <div className="aspect-video rounded-2xl border border-white/10 bg-slate-950 p-4">
+                      <div className="mb-4 flex items-center gap-2">
+                        <div className="h-3 w-3 rounded-full bg-red-400" />
+                        <div className="h-3 w-3 rounded-full bg-yellow-400" />
+                        <div className="h-3 w-3 rounded-full bg-green-400" />
+                      </div>
+                      <div className="rounded-xl bg-white p-4 text-slate-950">
+                        <div className="mb-4 h-4 w-28 rounded bg-slate-200" />
+                        <div className="space-y-3">
+                          <div className="h-12 rounded-xl bg-slate-100" />
+                          <div className="h-12 rounded-xl bg-slate-100" />
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="h-16 rounded-xl bg-slate-100" />
+                            <div className="h-16 rounded-xl bg-slate-100" />
+                          </div>
+                          <div className="mt-5 rounded-xl border border-dashed border-slate-300 p-3">
+                            <div className="mb-2 h-3 w-20 rounded bg-slate-200" />
+                            <div className="h-3 w-40 rounded bg-slate-200" />
+                          </div>
+                          <div className="h-12 rounded-xl bg-slate-950" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between text-sm text-slate-400">
+                      <span>Replay timestamp</span>
+                      <span>01:12 / 03:00</span>
+                    </div>
+                  </div>
+
+                  <div className="p-5">
+                    <div className="mb-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4">
+                      <p className="text-xs uppercase tracking-[0.2em] text-cyan-200">Persona</p>
+                      <h4 className="mt-2 font-semibold">54-year-old price-sensitive shopper</h4>
+                      <p className="mt-2 text-sm leading-6 text-slate-300">
+                        Seoul · office worker · checks final costs carefully · hesitant when fees are unclear
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <TimelineItem time="00:28" label="Repeated click on coupon field" />
+                      <TimelineItem time="00:51" label="Long hesitation near total price" active />
+                      <TimelineItem time="01:12" label="Back navigation detected" />
+                    </div>
+
+                    <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                      <p className="text-sm font-medium text-white">Interview excerpt</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-300">
+                        “I don’t know whether the delivery fee is already included. I would rather go back and check before paying.”
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+
+      <section id="product" className="mx-auto max-w-7xl px-6 py-24">
+        <div className="max-w-3xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-300">Product</p>
+          <h2 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl">
+            UX research loops for teams shipping with AI.
+          </h2>
+          <p className="mt-5 text-lg leading-8 text-slate-300">
+            PersonaBench gives developers, PMs, designers, and UX researchers the same evidence: what the persona tried, where they got confused, why they dropped off, and what should be fixed.
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {workflow.map((item) => (
+            <Card key={item.title} className="rounded-3xl border-white/10 bg-white/[0.04] text-white">
+              <CardContent className="p-6">
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-300/10 text-cyan-200">
+                  <item.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-300">{item.body}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-white/[0.03]">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-300">Data-grounded personas</p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl">
+              Not prompt vibes. Dataset-grounded agents.
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-slate-300">
+              Search across country-specific Nemotron-Personas datasets, narrow by metadata, then compile each selected record into a UX behavior profile for testing.
+            </p>
+            <div className="mt-8 grid gap-3 text-sm text-slate-300">
+              <FeatureLine icon={Globe2} text="Country-specific persona collections for global product testing" />
+              <FeatureLine icon={Database} text="Metadata filters for age, region, occupation, education, family type, and more" />
+              <FeatureLine icon={ShieldCheck} text="Persona provenance included in every report for traceability" />
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            {personas.map((persona) => (
+              <Card key={persona.name} className="rounded-3xl border-white/10 bg-slate-900 text-white">
+                <CardContent className="p-6">
+                  <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
+                    <div>
+                      <p className="text-sm text-slate-400">{persona.meta}</p>
+                      <h3 className="mt-2 text-xl font-semibold">{persona.name}</h3>
+                    </div>
+                    <Button variant="outline" className="rounded-full border-white/15 bg-white/5 text-white hover:bg-white/10">
+                      Preview
+                    </Button>
+                  </div>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {persona.traits.map((trait) => (
+                      <span key={trait} className="rounded-full bg-white/10 px-3 py-1 text-sm text-slate-200">
+                        {trait}
+                      </span>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-24">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1fr]">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-300">Evidence</p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl">
+              Every insight comes with replay-backed proof.
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-slate-300">
+              PersonaBench does not just say “users may be confused.” It shows the moment of confusion, the behavior pattern, the post-session interview, and the suggested fix.
+            </p>
+          </div>
+
+          <div className="space-y-5">
+            {findings.map((finding) => (
+              <Card key={finding.title} className="rounded-3xl border-white/10 bg-white/[0.04] text-white">
+                <CardContent className="p-6">
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className="rounded-full bg-rose-400/10 px-3 py-1 text-sm font-medium text-rose-200">
+                      {finding.label}
+                    </span>
+                    <span className="text-sm text-slate-400">UX Finding</span>
+                  </div>
+                  <h3 className="text-xl font-semibold">{finding.title}</h3>
+                  <p className="mt-4 text-sm leading-6 text-slate-300">“{finding.quote}”</p>
+                  <div className="mt-5 flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/70 p-3 text-sm text-slate-300">
+                    <Eye className="h-4 w-4 text-cyan-200" />
+                    {finding.evidence}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="developers" className="border-y border-white/10 bg-slate-900/60">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 lg:grid-cols-[0.95fr_1.05fr]">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-300">Developers</p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl">
+              Open-source UX CI for Claude Code and Codex.
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-slate-300">
+              Run local tests, generate replay artifacts, expose findings over MCP, and let your coding agent implement the smallest fix that addresses the observed UX failure.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button className="rounded-full bg-white px-6 text-slate-950 hover:bg-slate-200">
+                Read docs
+              </Button>
+              <Button variant="outline" className="rounded-full border-white/15 bg-white/5 px-6 text-white hover:bg-white/10">
+                Install CLI
+              </Button>
+            </div>
+          </div>
+
+          <Card className="rounded-3xl border-white/10 bg-slate-950 text-white shadow-2xl shadow-black/30">
+            <CardContent className="p-6">
+              <div className="mb-4 flex items-center gap-2 text-sm text-slate-400">
+                <Code2 className="h-4 w-4" /> terminal
+              </div>
+              <pre className="overflow-x-auto rounded-2xl bg-black/60 p-5 text-sm leading-7 text-slate-200">
+{`personabench run \\
+  --url http://localhost:3000/checkout \\
+  --task "Complete your first purchase" \\
+  --persona-source hf:nvidia/Nemotron-Personas-Korea \\
+  --persona-query "price-sensitive mobile shopper" \\
+  --sample 8
+
+personabench report
+personabench fix --finding F-003 --agent codex`}
+              </pre>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <section id="enterprise" className="mx-auto max-w-7xl px-6 py-24">
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Card className="rounded-3xl border-white/10 bg-white/[0.04] text-white lg:col-span-1">
+            <CardContent className="p-8">
+              <LockKeyhole className="mb-6 h-9 w-9 text-cyan-200" />
+              <h3 className="text-2xl font-semibold">Enterprise-ready from day one</h3>
+              <p className="mt-4 leading-7 text-slate-300">
+                For teams that need private runners, self-hosted deployment, audit logs, retention controls, SSO, RBAC, and custom persona libraries.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-3xl border-white/10 bg-cyan-300 text-slate-950 lg:col-span-2">
+            <CardContent className="p-8">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-700">Business model</p>
+              <h3 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
+                OSS for adoption. Hosted UI for teams. Private persona labs for enterprise.
+              </h3>
+              <div className="mt-8 grid gap-4 md:grid-cols-3">
+                <MiniPlan title="Open Source" items={["CLI", "Local runner", "MCP server", "Basic reports"]} />
+                <MiniPlan title="Team" items={["Hosted dashboard", "Replay storage", "Persona packs", "GitHub/Linear"]} />
+                <MiniPlan title="Enterprise" items={["SSO/RBAC", "Private runner", "Custom datasets", "Audit & retention"]} />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <section id="oss" className="border-t border-white/10">
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-6 py-20 md:flex-row md:items-center">
+          <div>
+            <h2 className="text-4xl font-semibold tracking-tight">Ready to stop guessing?</h2>
+            <p className="mt-4 max-w-2xl text-lg text-slate-300">
+              Run data-grounded persona agents before your next release. Watch where they fail. Ship the fix with your coding agent.
+            </p>
+          </div>
+          <Button size="lg" className="rounded-full bg-cyan-300 px-7 text-slate-950 hover:bg-cyan-200">
+            Join the waitlist
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function TimelineItem({ time, label, active = false }: { time: string; label: string; active?: boolean }) {
+  return (
+    <div className={`flex gap-3 rounded-2xl border p-3 ${active ? "border-cyan-300/30 bg-cyan-300/10" : "border-white/10 bg-white/[0.03]"}`}>
+      <span className="font-mono text-xs text-cyan-200">{time}</span>
+      <span className="text-sm text-slate-300">{label}</span>
+    </div>
+  );
+}
+
+function FeatureLine({ icon: Icon, text }: { icon: React.ElementType; text: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <Icon className="h-5 w-5 text-cyan-200" />
+      <span>{text}</span>
+    </div>
+  );
+}
+
+function MiniPlan({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className="rounded-2xl bg-slate-950/10 p-5">
+      <h4 className="font-semibold">{title}</h4>
+      <ul className="mt-4 space-y-2 text-sm text-slate-800">
+        {items.map((item) => (
+          <li key={item} className="flex items-center gap-2">
+            <GitPullRequestArrow className="h-4 w-4" />
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
