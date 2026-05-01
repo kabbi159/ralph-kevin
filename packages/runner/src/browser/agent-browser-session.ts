@@ -138,9 +138,22 @@ export class AgentBrowserSession {
   }
 
   async fill(ref: string, text: string): Promise<void> {
-    const r = await this.invoke(this.argv("fill", `@${ref.replace(/^@/, "")}`, text), 15_000);
-    if (r.exitCode !== 0) {
-      throw new Error(`agent-browser fill @${ref} failed: ${r.stderr.trim()}`);
+    // The real argv carries the typed text so agent-browser can fill the field.
+    // The argv reported through onIO replaces the typed text with `[REDACTED]`
+    // — an event-log subscriber that records onIO lines must never see raw
+    // CC numbers / passwords even if the safety policy upstream did not
+    // transform the AgentAction (defense-in-depth per docs/07).
+    const realArgv = this.argv("fill", `@${ref.replace(/^@/, "")}`, text);
+    const safeArgv = this.argv("fill", `@${ref.replace(/^@/, "")}`, "[REDACTED]");
+    const result = await this.spawnFn(realArgv, {
+      timeoutMs: this.opts.defaultCommandTimeoutMs ?? 15_000,
+    });
+    if (this.opts.onIO) {
+      if (result.stdout) this.opts.onIO({ stream: "stdout", text: result.stdout, argv: safeArgv });
+      if (result.stderr) this.opts.onIO({ stream: "stderr", text: result.stderr, argv: safeArgv });
+    }
+    if (result.exitCode !== 0) {
+      throw new Error(`agent-browser fill @${ref} failed: ${result.stderr.trim()}`);
     }
   }
 

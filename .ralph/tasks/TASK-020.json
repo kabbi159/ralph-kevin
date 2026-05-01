@@ -17,7 +17,5 @@
     "packages/runner/src/browser/spawn-agent-browser.ts",
     "packages/runner/src/__tests__/agent-browser-session.test.ts"
   ],
-  "depends": [
-    "TASK-016"
-  ]
+  "depends": ["TASK-016"]
 }

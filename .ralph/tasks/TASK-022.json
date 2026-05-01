@@ -2,7 +2,7 @@
   "id": "TASK-022",
   "phase": "P3",
   "title": "DecisionProvider interface + MockDecisionProvider + ClaudeDecisionProvider (Anthropic SDK)",
-  "status": "pending",
+  "status": "completed",
   "pattern": "B",
   "acceptance": [
     "packages/runner/src/decide/decision-provider.ts: DecisionProvider interface taking { observation, persona, task, recentHistory } → AgentAction",
@@ -17,5 +17,7 @@
     "packages/runner/src/decide/claude-decision-provider.ts",
     "packages/runner/src/__tests__/decision-provider.test.ts"
   ],
-  "depends": ["TASK-021"]
+  "depends": [
+    "TASK-021"
+  ]
 }

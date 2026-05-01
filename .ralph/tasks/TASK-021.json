@@ -14,7 +14,5 @@
     "packages/runner/src/observe/compact-snapshot.ts",
     "packages/runner/src/__tests__/compact-snapshot.test.ts"
   ],
-  "depends": [
-    "TASK-020"
-  ]
+  "depends": ["TASK-020"]
 }

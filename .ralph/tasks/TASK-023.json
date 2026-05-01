@@ -2,7 +2,7 @@
   "id": "TASK-023",
   "phase": "P3",
   "title": "Action executor + safety policy (allowlist, payment block, redaction)",
-  "status": "pending",
+  "status": "completed",
   "pattern": "A",
   "acceptance": [
     "packages/runner/src/safety/policy.ts: checkAction(action, context) → 'allow' | { block: 'safety_violation', reason } | { block: 'payment_blocked' }",
@@ -17,5 +17,7 @@
     "packages/runner/src/safety/redact.ts",
     "packages/runner/src/__tests__/safety-policy.test.ts"
   ],
-  "depends": ["TASK-022"]
+  "depends": [
+    "TASK-022"
+  ]
 }
