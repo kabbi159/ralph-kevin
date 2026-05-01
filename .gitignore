@@ -1,0 +1,17 @@
+.DS_Store
+.claude/settings.local.json
+.claude/hooks/*.log
+
+# Secrets — never commit
+.env
+.env.local
+.env.*.local
+
+# Python venv used for HF dataset tooling
+.venv/
+
+# Local persona dataset cache (~2GB; downloaded via huggingface-cli)
+data/personas/
+
+# Run artifacts
+.personabench/

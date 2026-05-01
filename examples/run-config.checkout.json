@@ -1,0 +1,48 @@
+{
+  "targetUrl": "http://localhost:3000/checkout",
+  "task": "Complete checkout up to the final payment confirmation. Do not make a real purchase.",
+  "successCriteria": [
+    "The persona can find the final total.",
+    "The persona can understand shipping fee status.",
+    "The persona can identify the next step CTA."
+  ],
+  "personaQuery": {
+    "source": {
+      "provider": "nvidia",
+      "dataset": "nvidia/Nemotron-Personas-Korea"
+    },
+    "textQuery": "price-sensitive mobile shopper who checks hidden fees before paying",
+    "demographics": {
+      "ageMin": 40,
+      "ageMax": 65
+    },
+    "uxTraits": {
+      "priceSensitivity": [4, 5],
+      "riskAversion": [3, 5],
+      "digitalLiteracy": [1, 3]
+    },
+    "sampleSize": 3,
+    "diversityBy": ["age", "region", "occupation"]
+  },
+  "viewport": {
+    "name": "mobile",
+    "width": 390,
+    "height": 844
+  },
+  "limits": {
+    "maxDurationSec": 180,
+    "maxActions": 30
+  },
+  "safety": {
+    "allowedDomains": ["localhost"],
+    "blockPaymentSubmission": true,
+    "blockDestructiveActions": true,
+    "redactSensitiveFields": true
+  },
+  "artifacts": {
+    "screenshots": true,
+    "video": true,
+    "trace": true,
+    "rrweb": false
+  }
+}
