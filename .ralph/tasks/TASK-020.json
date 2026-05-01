@@ -2,7 +2,7 @@
   "id": "TASK-020",
   "phase": "P3",
   "title": "agent-browser subprocess driver (open/close lifecycle, observation, screenshots)",
-  "status": "pending",
+  "status": "completed",
   "pattern": "B",
   "acceptance": [
     "packages/runner/src/browser/agent-browser-session.ts: AgentBrowserSession class wrapping a long-lived `agent-browser --session <runId>` subprocess",
@@ -17,5 +17,7 @@
     "packages/runner/src/browser/spawn-agent-browser.ts",
     "packages/runner/src/__tests__/agent-browser-session.test.ts"
   ],
-  "depends": ["TASK-016"]
+  "depends": [
+    "TASK-016"
+  ]
 }
