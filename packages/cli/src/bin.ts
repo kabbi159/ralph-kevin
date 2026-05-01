@@ -1,10 +1,37 @@
 #!/usr/bin/env node
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { compareCommand } from "./compare-command";
 import { installCommand, uninstallCommand } from "./install-command";
 import { runBatchCommand, runCommand } from "./run-command";
+
+// Load .env from the repo root before any module reads process.env. We don't
+// pull in `dotenv` to keep the dep surface small — a four-line parser is
+// enough for KEY=value plus quoted values.
+const loadDotenv = (path: string): void => {
+  if (!existsSync(path)) return;
+  const text = readFileSync(path, "utf8");
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (line.length === 0 || line.startsWith("#")) continue;
+    const eq = line.indexOf("=");
+    if (eq < 0) continue;
+    const key = line.slice(0, eq).trim();
+    let value = line.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (process.env[key] === undefined) process.env[key] = value;
+  }
+};
+
+const _here = dirname(fileURLToPath(import.meta.url));
+const _repoRoot = resolve(_here, "..", "..", "..");
+loadDotenv(resolve(_repoRoot, ".env"));
 
 const args = process.argv.slice(2);
 const cmd = args[0] ?? "help";

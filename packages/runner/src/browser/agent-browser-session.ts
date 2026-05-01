@@ -38,6 +38,19 @@ const renderViewport = (v: AgentBrowserViewport | undefined): string | null => {
   return `${v.width}x${v.height}`;
 };
 
+const PRESETS: Record<"mobile" | "desktop", { width: number; height: number }> = {
+  mobile: { width: 390, height: 844 },
+  desktop: { width: 1280, height: 800 },
+};
+
+const renderViewportSize = (
+  v: AgentBrowserViewport | undefined,
+): { width: number; height: number } | null => {
+  if (!v) return null;
+  if (typeof v === "string") return PRESETS[v];
+  return v;
+};
+
 export class AgentBrowserSession {
   private readonly opts: SessionOpts;
   private readonly spawnFn: SpawnFn;
@@ -85,14 +98,32 @@ export class AgentBrowserSession {
     if (this.opts.allowedDomains?.length) {
       args.push("--allowed-domains", this.opts.allowedDomains.join(","));
     }
-    const vp = renderViewport(this.opts.viewport);
-    if (vp) args.push("--viewport", vp);
     args.push("open", url);
     const r = await this.invoke(args, 30_000);
     if (r.exitCode !== 0) {
       throw new Error(`agent-browser open failed (exit=${r.exitCode}): ${r.stderr.trim()}`);
     }
     this.opened = true;
+
+    // Set viewport in a follow-up call (agent-browser exposes `viewport <w> <h>`
+    // as a separate subcommand, not as a flag on `open`).
+    const vp = renderViewportSize(this.opts.viewport);
+    if (vp) {
+      const r2 = await this.invoke(
+        this.argv("viewport", String(vp.width), String(vp.height)),
+        10_000,
+      );
+      if (r2.exitCode !== 0) {
+        // Non-fatal — some pages don't allow viewport override; log via onIO
+        // and keep the session alive.
+        this.opts.onIO?.({
+          stream: "stderr",
+          text: `agent-browser viewport ${vp.width}x${vp.height} failed: ${r2.stderr.trim()}`,
+          argv: this.argv("viewport", String(vp.width), String(vp.height)),
+        });
+      }
+    }
+
     let origin = "";
     try {
       const parsed = JSON.parse(r.stdout);
@@ -107,7 +138,6 @@ export class AgentBrowserSession {
         const u = new URL(url);
         origin = u.origin;
       } catch {
-        // bubble up: caller should pass a valid URL
         throw new Error(`agent-browser open: targetUrl is not a valid URL: ${url}`);
       }
     }

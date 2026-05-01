@@ -142,23 +142,51 @@ export const runCommand = async (opts: RunCommandOpts): Promise<RunCommandResult
 
   // 2. Generate run events.
   const startedAt = Date.now();
-  const events =
-    mode === "scripted-postfix"
-      ? buildCheckoutPostFixEvents(runId, persona.personaId, startedAt)
-      : mode === "scripted"
-        ? buildCheckoutScriptedEvents(runId, persona.personaId, startedAt)
-        : mode === "scripted-multi"
-          ? buildPersonaConditionedEvents(personaRecord, runId, startedAt)
-          : (() => {
-              throw new Error(
-                "personabench run --live: end-to-end live runner deferred per .ralph/spec-changes.md (TASK-050).",
-              );
-            })();
-
-  // 3. Persist events.ndjson.
   const eventsPath = join(runDir, "events.ndjson");
   const sink = createFileEventSink(eventsPath);
-  for (const ev of events) sink(ev);
+  const events: import("@personabench/core").RunEvent[] = [];
+
+  if (mode === "live") {
+    // Real agent-browser drive. Spawn a session, run the observe→decide→act
+    // loop with ClaudeDecisionProvider, persist every RunEvent to disk AND
+    // capture in `events` so the analyzer can run on the resulting log.
+    const { AgentBrowserSession, ClaudeDecisionProvider, runPersonaTest } = await import(
+      "@personabench/runner"
+    );
+    const sessionId = runId.replace(/[^a-z0-9_-]/gi, "_");
+    const browser = new AgentBrowserSession({
+      sessionId,
+      allowedDomains: config.safety.allowedDomains,
+      viewport: config.viewport
+        ? { width: config.viewport.width, height: config.viewport.height }
+        : "mobile",
+    });
+    const provider = new ClaudeDecisionProvider();
+    const dualSink = (ev: import("@personabench/core").RunEvent): void => {
+      events.push(ev);
+      sink(ev);
+    };
+    await runPersonaTest({
+      runId,
+      personaProfile: persona,
+      config,
+      decisionProvider: provider,
+      browser,
+      runDir,
+      eventSink: dualSink,
+    });
+  } else {
+    const scripted =
+      mode === "scripted-postfix"
+        ? buildCheckoutPostFixEvents(runId, persona.personaId, startedAt)
+        : mode === "scripted"
+          ? buildCheckoutScriptedEvents(runId, persona.personaId, startedAt)
+          : buildPersonaConditionedEvents(personaRecord, runId, startedAt);
+    for (const ev of scripted) {
+      events.push(ev);
+      sink(ev);
+    }
+  }
 
   // 4. Detectors → friction-signals.json.
   const signals = runDetectors(events, { runId, personaId: persona.personaId });

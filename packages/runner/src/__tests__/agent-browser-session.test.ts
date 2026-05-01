@@ -49,7 +49,7 @@ const buildSpawn = (
 };
 
 describe("AgentBrowserSession argv shape", () => {
-  it("open passes --session, --allowed-domains, --viewport, then `open <url>`", async () => {
+  it("open passes --session, --allowed-domains, then `open <url>`; viewport is set in a follow-up call", async () => {
     const { spawnFn, argvLog } = buildSpawn({});
     const sess = new AgentBrowserSession({
       sessionId: "run_test",
@@ -63,14 +63,14 @@ describe("AgentBrowserSession argv shape", () => {
       "run_test",
       "--allowed-domains",
       "localhost,example.test",
-      "--viewport",
-      "mobile",
       "open",
       "http://localhost:3100/checkout",
     ]);
+    // viewport is a separate subcommand, dispatched right after open succeeds
+    expect(argvLog[1]).toEqual(["--session", "run_test", "viewport", "390", "844"]);
   });
 
-  it("supports a {width,height} viewport", async () => {
+  it("supports a {width,height} viewport via follow-up viewport subcommand", async () => {
     const { spawnFn, argvLog } = buildSpawn({});
     const sess = new AgentBrowserSession({
       sessionId: "run_w",
@@ -78,8 +78,7 @@ describe("AgentBrowserSession argv shape", () => {
       spawnFn,
     });
     await sess.open("http://localhost:3100/");
-    expect(argvLog[0]).toContain("--viewport");
-    expect(argvLog[0]).toContain("390x844");
+    expect(argvLog[1]).toEqual(["--session", "run_w", "viewport", "390", "844"]);
   });
 
   it("snapshot --json parses {origin, snapshot, refs} and exposes raw json verbatim", async () => {
