@@ -96,6 +96,21 @@ export const checkAction = (action: AgentAction, ctx: SafetyContext): SafetyDeci
         detail: `Click on '${text}' looks like a final payment action.`,
       };
     }
+    // Coordinate-only click (no selector, just x/y) on a payment-keyword page
+    // is the safety-auditor's H2 bypass case. We can't inspect the element
+    // under the cursor, so we conservatively block when the page's visible
+    // text contains a payment keyword.
+    if (!action.selector && (action.x !== undefined || action.y !== undefined)) {
+      const haystack = (ctx.observation?.visibleText ?? "").toLowerCase();
+      if (matchesAny(haystack, PAYMENT_PATTERNS)) {
+        return {
+          kind: "block",
+          reason: "payment_blocked",
+          detail:
+            "Coordinate click on a page whose visible text mentions a payment action — refusing to forward without an explicit selector.",
+        };
+      }
+    }
   }
 
   if (action.type === "click" && ctx.blockDestructiveActions) {

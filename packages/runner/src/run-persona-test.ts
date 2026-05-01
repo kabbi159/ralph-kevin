@@ -11,6 +11,7 @@ import type { DecisionProvider } from "./decide/decision-provider";
 import type { EventSink } from "./event-log";
 import { compactSnapshot } from "./observe/compact-snapshot";
 import { type SafetyContext, checkAction } from "./safety/policy";
+import { redactSensitiveText } from "./safety/redact";
 
 // Stop reasons mapped onto docs/04 stop outcomes plus the runner-internal
 // budget / safety branches. Persisted on the final RunEvent and surfaced
@@ -101,6 +102,15 @@ export const runPersonaTest = async (opts: RunPersonaTestOpts): Promise<RunPerso
     const snap = await browser.snapshot();
     currentUrl = snap.raw.origin;
     const observation = compactSnapshot(snap.raw);
+
+    // Defense-in-depth: scrub any CC / token-like substring from the
+    // compacted visibleText BEFORE it reaches writeEvent → events.ndjson.
+    // Page content is untrusted; if a prior step typed a card number into
+    // a form whose value renders back to the DOM, the next snapshot's
+    // visibleText would contain it. (safety-auditor finding H1.)
+    if (config.safety.redactSensitiveFields && observation.visibleText) {
+      observation.visibleText = redactSensitiveText(observation.visibleText);
+    }
 
     // H2 enforcement — re-check allowlist after every snapshot.
     if (

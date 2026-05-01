@@ -65,7 +65,7 @@ export const renderReportHtml = (input: RenderReportInput): string => {
       </details>
       <details>
         <summary>Evidence (${f.evidence.eventIds.length} event${f.evidence.eventIds.length === 1 ? "" : "s"})</summary>
-        <p>Event IDs: <code>${f.evidence.eventIds.map(escape).join(", ")}</code></p>
+        <p>Event IDs: <code>${f.evidence.eventIds.map((v) => escapeHtml(v)).join(", ")}</code></p>
         ${
           f.evidence.screenshots && f.evidence.screenshots.length > 0
             ? `<div class="shots">${f.evidence.screenshots
@@ -163,7 +163,7 @@ export const renderReportHtml = (input: RenderReportInput): string => {
         : ""
     }
     <p><b>Limits:</b> ${config.limits.maxDurationSec}s, ${config.limits.maxActions} actions</p>
-    <p><b>Allowlist:</b> ${config.safety.allowedDomains.map(escape).join(", ")}</p>
+    <p><b>Allowlist:</b> ${config.safety.allowedDomains.map((v) => escapeHtml(v)).join(", ")}</p>
   </section>
 
   <h2>Persona</h2>

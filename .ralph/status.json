@@ -17,12 +17,6 @@
   },
   "stretchQueueProgress": {
     "current": null,
-    "completed": [
-      "S2",
-      "S6",
-      "S7",
-      "S8",
-      "S9"
-    ]
+    "completed": ["S2", "S6", "S7", "S8", "S9"]
   }
 }

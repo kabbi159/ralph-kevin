@@ -114,6 +114,38 @@ describe("safety/checkAction — payment block", () => {
     );
     expect(r.kind).toBe("allow");
   });
+
+  it("blocks coordinate-only clicks when the page's visible text mentions a payment keyword (auditor H2)", () => {
+    const r = checkAction(
+      { type: "click", x: 200, y: 720, reason: "tap a button" },
+      {
+        allowedDomains: ["localhost"],
+        blockPaymentSubmission: true,
+        blockDestructiveActions: false,
+        redactSensitiveFields: false,
+        observation: {
+          ...obs([], "http://localhost:3100"),
+          visibleText: "주문/결제 — 결제 확정",
+        },
+      },
+    );
+    expect(r.kind).toBe("block");
+    if (r.kind === "block") expect(r.reason).toBe("payment_blocked");
+  });
+
+  it("allows coordinate clicks on pages whose visible text has no payment keyword", () => {
+    const r = checkAction(
+      { type: "click", x: 50, y: 50, reason: "tap" },
+      {
+        allowedDomains: ["localhost"],
+        blockPaymentSubmission: true,
+        blockDestructiveActions: false,
+        redactSensitiveFields: false,
+        observation: { ...obs([], "http://localhost:3100"), visibleText: "About us" },
+      },
+    );
+    expect(r.kind).toBe("allow");
+  });
 });
 
 describe("safety/checkAction — destructive action block", () => {
