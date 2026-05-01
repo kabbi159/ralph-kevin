@@ -1,5 +1,5 @@
 {
-  "iteration": 23,
+  "iteration": 27,
   "currentPhase": "P3",
   "currentTaskId": "TASK-024",
   "currentTaskStatus": "completed",
@@ -8,7 +8,7 @@
   "branch": "develop",
   "lastCommitSha": "e54d8238b8db8425e5188112355b53773440191d",
   "lastPushAt": "2026-05-01T13:44:16+0900",
-  "handoffNote": "S5 MCP server shipped — 5 tools wired via stdio transport. 188 tests across 6 packages. Final state: G1+G2+G3+G4 green, S2/S5/S6/S7/S8/S9 of 10 stretch items shipped.",
+  "handoffNote": "All 4 demo gates GREEN (G1+G2+G3+G4). All 10 stretch items GREEN (S1-S10). agent-browser live mode validated against examples/ecommerce-checkout. Web app form-driven POST creates real runs and surfaces them on the dashboard. Korean default; lang=auto|ko|en flag. Crack live-site distinguishable via 🔥 Crack Live badge.",
   "gates": {
     "G1": "green",
     "G2": "green",
@@ -17,6 +17,17 @@
   },
   "stretchQueueProgress": {
     "current": null,
-    "completed": ["S2", "S5", "S6", "S7", "S8", "S9"]
+    "completed": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8",
+      "S9",
+      "S10"
+    ]
   }
 }
