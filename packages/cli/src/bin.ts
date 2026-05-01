@@ -129,13 +129,41 @@ const main = async (): Promise<void> => {
   if (cmd === "mcp") {
     if (hasFlag("--help") || hasFlag("-h")) {
       console.log(
-        "personabench mcp — MCP server (stub; full stdio implementation deferred to stretch S5).",
+        "personabench mcp — start the MCP stdio server. Tools: run_persona_ux_test, get_ux_findings, get_replay_link, generate_fix_prompt, list_runs.",
       );
       return;
     }
-    console.error(
-      "personabench mcp: full MCP stdio server is deferred (stretch S5). The stub command exits 0 so the install path can register the entry.",
-    );
+    const { startStdioServer } = await import("@personabench/mcp-server");
+    const { writeFileSync } = await import("node:fs");
+    // CLI wires its own runExecutor — calls runCommand via a synthesized
+    // RunConfig at /tmp. Decouples mcp-server from the CLI package.
+    await startStdioServer({
+      runExecutor: async (input) => {
+        const cfg = {
+          targetUrl: input.targetUrl,
+          task: input.task,
+          successCriteria: input.successCriteria,
+          limits: { maxDurationSec: input.maxDurationSec ?? 180, maxActions: 30 },
+          safety: {
+            allowedDomains: [new URL(input.targetUrl).hostname],
+            blockPaymentSubmission: true,
+            blockDestructiveActions: true,
+            redactSensitiveFields: true,
+          },
+          artifacts: { screenshots: true, video: false, trace: false, rrweb: false },
+        };
+        const tmp = `/tmp/personabench-mcp-${Date.now()}.json`;
+        writeFileSync(tmp, JSON.stringify(cfg));
+        const r = await runCommand({ configPath: tmp, mode: "scripted" });
+        return {
+          runId: r.runId,
+          runDir: r.runDir,
+          reportPath: r.reportPath,
+          signalCount: r.signalCount,
+          findingCount: r.findings.length,
+        };
+      },
+    });
     return;
   }
 
