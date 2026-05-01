@@ -1,0 +1,20 @@
+{
+  "id": "TASK-024",
+  "phase": "P3",
+  "title": "runPersonaTest orchestrator (observe → decide → act loop, event log)",
+  "status": "pending",
+  "pattern": "B",
+  "acceptance": [
+    "packages/runner/src/run-persona-test.ts: runPersonaTest({ runId, personaProfile, config, decisionProvider, browser }) → { stopReason, eventCount }",
+    "Loop: open URL → snapshot → DecisionProvider.decide → safety.checkAction → execute via browser → screenshot → log RunEvent → stop on (action.type==='stop' | maxActions | maxDurationSec | safety_violation)",
+    "Each step writes one RunEvent to events.ndjson under .personabench/runs/<runId>/",
+    "stopReason ∈ {success, dropoff, blocked, timeout, action_limit, safety_violation, payment_blocked}",
+    "Tests: drive the loop with MockDecisionProvider + a fake AgentBrowserSession; verify event log shape, max-action stop, max-duration stop, safety stop"
+  ],
+  "files": [
+    "packages/runner/src/run-persona-test.ts",
+    "packages/runner/src/event-log.ts",
+    "packages/runner/src/__tests__/run-persona-test.test.ts"
+  ],
+  "depends": ["TASK-023"]
+}

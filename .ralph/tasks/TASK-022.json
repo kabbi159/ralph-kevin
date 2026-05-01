@@ -1,0 +1,21 @@
+{
+  "id": "TASK-022",
+  "phase": "P3",
+  "title": "DecisionProvider interface + MockDecisionProvider + ClaudeDecisionProvider (Anthropic SDK)",
+  "status": "pending",
+  "pattern": "B",
+  "acceptance": [
+    "packages/runner/src/decide/decision-provider.ts: DecisionProvider interface taking { observation, persona, task, recentHistory } → AgentAction",
+    "MockDecisionProvider: deterministic action plan from a fixture; used in tests",
+    "ClaudeDecisionProvider: calls Anthropic SDK with claude-haiku-4-5-20251001 by default; injects PersonaUXProfile.promptBlock; parses model output into AgentAction (Zod-validated)",
+    "Anthropic API key from process.env.ANTHROPIC_API_KEY; missing key → throws PERSONA_RUNTIME_KEY_MISSING (graceful, not silent)",
+    "Tests: MockDecisionProvider drives a 5-step plan; ClaudeDecisionProvider unit test mocks the SDK and verifies prompt assembly + action parsing"
+  ],
+  "files": [
+    "packages/runner/src/decide/decision-provider.ts",
+    "packages/runner/src/decide/mock-decision-provider.ts",
+    "packages/runner/src/decide/claude-decision-provider.ts",
+    "packages/runner/src/__tests__/decision-provider.test.ts"
+  ],
+  "depends": ["TASK-021"]
+}

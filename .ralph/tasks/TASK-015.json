@@ -15,8 +15,6 @@
     "packages/personas/src/sources/huggingface-source.ts",
     "packages/personas/src/__tests__/huggingface-source.test.ts"
   ],
-  "depends": [
-    "TASK-011"
-  ],
+  "depends": ["TASK-011"],
   "deferIf": "Time budget tight — LocalParquet covers offline path; HF is the network fallback."
 }

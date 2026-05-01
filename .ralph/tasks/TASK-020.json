@@ -1,0 +1,21 @@
+{
+  "id": "TASK-020",
+  "phase": "P3",
+  "title": "agent-browser subprocess driver (open/close lifecycle, observation, screenshots)",
+  "status": "pending",
+  "pattern": "B",
+  "acceptance": [
+    "packages/runner/src/browser/agent-browser-session.ts: AgentBrowserSession class wrapping a long-lived `agent-browser --session <runId>` subprocess",
+    "Methods: open(url, opts), snapshot() → { origin, snapshot, refs }, click(ref), fill(ref, text), scroll(direction), back(), screenshot(path), close()",
+    "Subprocess stdout/stderr piped into a callback so the runner can log `agent_browser_io` lines",
+    "On signal/abort, daemon shuts down without leaking chrome processes",
+    "Allowlist passed via --allowed-domains; viewport via --viewport mobile|wxh",
+    "Tests: a mock subprocess strategy verifies all command shapes; an integration test against `examples/ecommerce-checkout` (port 3100) is gated on AGENT_BROWSER_E2E=1"
+  ],
+  "files": [
+    "packages/runner/src/browser/agent-browser-session.ts",
+    "packages/runner/src/browser/spawn-agent-browser.ts",
+    "packages/runner/src/__tests__/agent-browser-session.test.ts"
+  ],
+  "depends": ["TASK-016"]
+}

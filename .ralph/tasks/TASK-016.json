@@ -2,7 +2,7 @@
   "id": "TASK-016",
   "phase": "P2",
   "title": "Phase 2 boundary: phase-tester + spec-reviewer + dataset-validator (Pattern C)",
-  "status": "pending",
+  "status": "completed",
   "pattern": "C",
   "acceptance": [
     "phase-tester runs `pnpm --filter @personabench/personas test` and reports green",

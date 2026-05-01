@@ -1,0 +1,16 @@
+{
+  "id": "TASK-025",
+  "phase": "P3",
+  "title": "Phase 3 boundary: phase-tester + spec-reviewer (Pattern C; safety-auditor optional given time budget)",
+  "status": "pending",
+  "pattern": "C",
+  "acceptance": [
+    "phase-tester runs `pnpm --filter @personabench/runner test` and reports green",
+    "spec-reviewer audits packages/runner against docs/04 + docs/07 (safety) acceptance criteria",
+    "safety-auditor runs IF time-budget signal is `active` (per boot prompt § Pattern rules)",
+    "All P3 tasks marked completed",
+    "Single commit with phase-complete trailer"
+  ],
+  "files": [],
+  "depends": ["TASK-020", "TASK-021", "TASK-022", "TASK-023", "TASK-024"]
+}

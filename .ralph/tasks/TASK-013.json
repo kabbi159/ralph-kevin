@@ -18,7 +18,5 @@
     "packages/personas/src/sources/duckdb-client.ts",
     "packages/personas/src/__tests__/local-parquet-source.test.ts"
   ],
-  "depends": [
-    "TASK-011"
-  ]
+  "depends": ["TASK-011"]
 }

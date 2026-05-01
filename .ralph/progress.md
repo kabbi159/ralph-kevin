@@ -4,6 +4,32 @@ Each iteration appends one block. Newest at the top.
 
 ---
 
+## Iteration 11 — 2026-05-01 14:15 KST — TASK-016 Phase 2 boundary (Pattern C, abbreviated)
+
+**Pattern:** C (abbreviated: spec-reviewer only; phase-tester not invoked because the test suite was just verified green at TASK-013 close)
+
+**Sub-agents consulted (P2 totals: 2 of 4 budget)**
+
+- TASK-011: `dataset-validator` (1)
+- TASK-016: `spec-reviewer` (1) — returned `ready=yes`. All 10 audited criteria met with file:line cites: PersonaSource interface signatures, MockPersonaSource ≥5 mock_-prefixed fixtures, NemotronNormalizer FIRST_CLASS_MAP coverage, narratives.raw catch-all on Korea + future columns, REQUIRED_SYSTEM_INSTRUCTION verbatim in promptBlock, no demographic invention on sparse rows, locale-agnostic compiler proven on US/EN record, @duckdb/node-api (NOT legacy `duckdb`), both checkout 40-65 and crack 19-19 demo conditions covered, provenance preserved end-to-end. One minor spec-gap observation (null-value handling in raw catch-all is engineering-reasonable but unspecified) — logged as a future doc clarification, not a blocker.
+
+**Phase 2 closed**
+
+- TASK-010 ✓ TASK-011 ✓ TASK-012 ✓ TASK-013 ✓ TASK-014 ⊘ TASK-015 ⊘ TASK-016 ✓
+- TASK-014 (BYO LocalJsonPersonaSource + diversity sampler) and TASK-015 (HuggingFace subprocess) explicitly skipped → routed to stretch S6/S15. LocalParquet covers the demo path; BYO and HF aren't on the demo critical path. The skip is intentional, not a gap.
+
+**Gates after Phase 2**
+
+- pnpm typecheck: pass
+- pnpm lint:check: pass
+- pnpm test: pass (core 57/57 + personas 36/36 = 93/93)
+
+**Next iteration**
+
+- Phase 3 (runner) — agent-browser subprocess wrapper, observation snapshot parser, ClaudeDecisionProvider, action execution + safety. The biggest remaining chunk before the demo gates G1/G2/G3.
+
+---
+
 ## Iteration 10 — 2026-05-01 14:13 KST — TASK-013 LocalParquetNemotronSource (DuckDB)
 
 **Pattern:** A (despite originally being scoped as B; the parquet schema was already mapped in iteration 7's probe and the SQL query shape is straightforward)

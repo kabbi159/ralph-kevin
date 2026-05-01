@@ -1,0 +1,21 @@
+{
+  "id": "TASK-023",
+  "phase": "P3",
+  "title": "Action executor + safety policy (allowlist, payment block, redaction)",
+  "status": "pending",
+  "pattern": "A",
+  "acceptance": [
+    "packages/runner/src/safety/policy.ts: checkAction(action, context) → 'allow' | { block: 'safety_violation', reason } | { block: 'payment_blocked' }",
+    "Domain allowlist enforced (parses observation.origin for outside-allowlist redirect)",
+    "Block payment submission: pattern-match on aria-label/text/selector for 결제 확정 / pay / submit-payment",
+    "Block destructive selectors (delete account, irreversible actions)",
+    "Redact: AgentTypeAction with text matching CC/CVV patterns is masked before being logged",
+    "Tests: each policy branch (allowlist hit, payment block, destructive block, redaction) has a unit test"
+  ],
+  "files": [
+    "packages/runner/src/safety/policy.ts",
+    "packages/runner/src/safety/redact.ts",
+    "packages/runner/src/__tests__/safety-policy.test.ts"
+  ],
+  "depends": ["TASK-022"]
+}
