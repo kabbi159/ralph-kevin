@@ -4,6 +4,33 @@ Each iteration appends one block. Newest at the top.
 
 ---
 
+## Iteration 7 — 2026-05-01 14:01 KST — TASK-010 PersonaSource interface + MockPersonaSource
+
+**Pattern:** A
+
+**What happened**
+
+- `packages/personas/src/sources/persona-source.ts` — `PersonaSource` interface + `PersonaSamplingConfig` + `PersonaSearchResult` types.
+- `packages/personas/src/sources/mock-source.ts` — `MockPersonaSource` shipping 5 fixture personas: 19yo design student (Seoul), 55yo café owner (Suwon), 42yo SWE dad (Mapo), 67yo retired teacher (Busan), 31yo freelance designer (Seongdong). Every fixture has `source.provider="mock"` and `mock_*` id (AGENTS.md provenance rule). Fixtures span age 19-67, 4 provinces, 5 occupations — gives downstream tests variety.
+- `matchesQuery()` covers age range, sex, country, province, and textQuery substring (case-insensitive, any-word match across persona narrative + occupation).
+- 9 vitest assertions: ≥5 fixtures all valid PersonaRecord, mock-provider rule, demographic diversity, age range filter, textQuery filter (Korean and English), province filter, sample size, getById hit/miss.
+
+**Probe result (run once, then deleted)**
+
+- DuckDB on `data/personas/nemotron-korea/data/train-00000-of-00009.parquet` confirms 26 columns: `uuid`, 7 narrative `*_persona`, 5 narrative scalars, 2 list columns (skills/hobbies — `VARCHAR`, JSON-encoded), `cultural_background`, `career_goals_and_ambitions`, demographics (sex, age BIGINT, marital_status, family_type, housing_type, education_level, occupation), locale (country, province, district), plus Korea-specific `military_status` + `bachelors_field`. The normalizer (TASK-011 next) maps these column names → camelCase fields, JSON-parses the list columns, converts `BIGINT age` to JS number, and routes the two Korea-specific columns into `narratives.raw`.
+
+**Gates**
+
+- pnpm typecheck: pass (11 packages)
+- pnpm lint:check: pass (88 files, zero violations)
+- pnpm test: pass (core 57/57 + personas 9/9 = 66/66)
+
+**Next iteration**
+
+- TASK-011: NemotronNormalizer over the Korea schema.
+
+---
+
 ## Iteration 6 — 2026-05-01 13:57 KST — TASK-006 Phase 1 boundary (Pattern C)
 
 **Pattern:** C (phase-tester + spec-reviewer in parallel)
