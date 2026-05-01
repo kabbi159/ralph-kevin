@@ -2,7 +2,7 @@
   "id": "TASK-011",
   "phase": "P2",
   "title": "NemotronNormalizer (Korea-row → PersonaRecord, locale-agnostic raw catch-all)",
-  "status": "pending",
+  "status": "completed",
   "pattern": "B",
   "acceptance": [
     "packages/personas/src/normalizers/nemotron.ts exports normalizeNemotronRow(row: Record<string, unknown>, ctx: { dataset, datasetRevision?, license? }): PersonaRecord",
@@ -17,5 +17,7 @@
     "packages/personas/src/normalizers/embedding-text.ts",
     "packages/personas/src/__tests__/nemotron-normalizer.test.ts"
   ],
-  "depends": ["TASK-010"]
+  "depends": [
+    "TASK-010"
+  ]
 }
