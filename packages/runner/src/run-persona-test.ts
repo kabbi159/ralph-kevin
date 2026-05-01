@@ -128,10 +128,12 @@ export const runPersonaTest = async (opts: RunPersonaTestOpts): Promise<RunPerso
       break;
     }
 
+    let observationShot: string | undefined;
     if (config.artifacts.screenshots) {
       const path = screenshotPath(stepIndex);
       try {
         await browser.screenshot(join(runDir, path));
+        observationShot = path;
       } catch {
         // best-effort screenshot
       }
@@ -192,6 +194,12 @@ export const runPersonaTest = async (opts: RunPersonaTestOpts): Promise<RunPerso
     let result: RunEvent["result"];
     try {
       result = await executeAction(browser, safeAction, screenshotPath(stepIndex));
+      // Attach the pre-action observation screenshot to the result so the
+      // analyzer's screenshotPaths-collection logic always sees a path
+      // (executeAction returns undefined for `stop` actions).
+      if (observationShot) {
+        result = { ...(result ?? {}), screenshotPath: observationShot };
+      }
     } catch (err) {
       writeEvent({
         stepIndex,

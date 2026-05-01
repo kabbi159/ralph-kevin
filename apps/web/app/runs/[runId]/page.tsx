@@ -153,6 +153,26 @@ export default async function RunDetailPage({
                         ? ` · 스크린샷 ${f.evidence.screenshots.length}`
                         : ""}
                     </div>
+                    {f.evidence.screenshots?.length ? (
+                      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {f.evidence.screenshots.map((rel) => (
+                          <a
+                            key={rel}
+                            href={`/api/runs/${runId}/artifacts/${rel}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="block overflow-hidden rounded-xl border border-white/10 bg-slate-950 transition hover:border-cyan-300/30"
+                          >
+                            <img
+                              src={`/api/runs/${runId}/artifacts/${rel}`}
+                              alt={rel}
+                              className="h-32 w-full object-cover object-top"
+                            />
+                            <p className="px-2 py-1 font-mono text-[10px] text-slate-500">{rel}</p>
+                          </a>
+                        ))}
+                      </div>
+                    ) : null}
                     <details className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
                       <summary className="cursor-pointer text-sm font-semibold text-slate-200">
                         진단 + 권고

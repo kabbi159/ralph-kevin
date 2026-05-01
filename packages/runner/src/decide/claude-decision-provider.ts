@@ -26,7 +26,7 @@ export type ClaudeDecisionProviderOpts = {
   chatFn?: ChatFn;
 };
 
-export const DEFAULT_DECISION_MODEL = "claude-haiku-4-5-20251001";
+export const DEFAULT_DECISION_MODEL = "claude-opus-4-7";
 
 const buildSystemPrompt = (input: DecisionInput): string => {
   const lines: string[] = [];
