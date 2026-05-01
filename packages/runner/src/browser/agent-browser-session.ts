@@ -99,7 +99,9 @@ export class AgentBrowserSession {
       args.push("--allowed-domains", this.opts.allowedDomains.join(","));
     }
     args.push("open", url);
-    const r = await this.invoke(args, 30_000);
+    // Live external sites (crack.wrtn.ai, etc.) sometimes need >30s for the
+    // first navigation due to CDN cold-start; give the open call 90s.
+    const r = await this.invoke(args, 90_000);
     if (r.exitCode !== 0) {
       throw new Error(`agent-browser open failed (exit=${r.exitCode}): ${r.stderr.trim()}`);
     }
