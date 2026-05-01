@@ -91,13 +91,16 @@ describe("runCommand (scripted)", () => {
     ).rejects.toThrow(/config file not found/);
   });
 
-  it("--mode live throws (deferred per spec-changes.md)", async () => {
+  it("--mode live now wired — without ANTHROPIC_API_KEY it surfaces a clear error", async () => {
     const runsRoot = mkdtempSync(join(tmpdir(), "personabench-cli-live-"));
+    const prev = process.env.ANTHROPIC_API_KEY;
+    process.env.ANTHROPIC_API_KEY = "";
     try {
       await expect(
         runCommand({ configPath: CHECKOUT_CONFIG, runsRoot, mode: "live" }),
-      ).rejects.toThrow(/deferred/);
+      ).rejects.toThrow(/ANTHROPIC_API_KEY/);
     } finally {
+      if (prev !== undefined) process.env.ANTHROPIC_API_KEY = prev;
       rmSync(runsRoot, { recursive: true, force: true });
     }
   });

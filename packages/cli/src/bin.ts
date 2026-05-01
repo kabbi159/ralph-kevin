@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { compareCommand } from "./compare-command";
 import { installCommand, uninstallCommand } from "./install-command";
+import { createMockPack, listPersonaPacks, loadPersonaPack } from "./persona-packs";
 import { runBatchCommand, runCommand } from "./run-command";
 
 // Load .env from the repo root before any module reads process.env. We don't
@@ -210,6 +211,63 @@ const main = async (): Promise<void> => {
     for (const step of result.steps) console.log(`  ✓ ${step}`);
     for (const warn of result.warnings) console.error(`  ⚠ ${warn}`);
     return;
+  }
+
+  if (cmd === "packs") {
+    const sub = args[1] ?? "list";
+    if (sub === "list") {
+      const packs = listPersonaPacks();
+      if (packs.length === 0) {
+        console.log("(no packs)");
+        return;
+      }
+      for (const p of packs) {
+        console.log(`  ${p.id.padEnd(36)} · ${p.coverage.size} 페르소나 · ${p.name}`);
+      }
+      return;
+    }
+    if (sub === "create") {
+      const id = flag("--id");
+      const name = flag("--name");
+      if (!id || !name) {
+        console.error(
+          "personabench packs create --id <id> --name <name> [--query <text>] [--age-min N] [--age-max N]",
+        );
+        process.exit(2);
+      }
+      const queryText = flag("--query");
+      const ageMin = flag("--age-min");
+      const ageMax = flag("--age-max");
+      const pack = await createMockPack({
+        id,
+        name,
+        query: {
+          textQuery: queryText,
+          demographics: {
+            ageMin: ageMin ? Number.parseInt(ageMin, 10) : undefined,
+            ageMax: ageMax ? Number.parseInt(ageMax, 10) : undefined,
+          },
+        },
+      });
+      console.log(`saved persona pack ${pack.id} · ${pack.coverage.size} 페르소나`);
+      return;
+    }
+    if (sub === "show") {
+      const idArg = args[2];
+      if (!idArg) {
+        console.error("personabench packs show <id>");
+        process.exit(2);
+      }
+      const pack = loadPersonaPack(idArg);
+      if (!pack) {
+        console.error(`personabench packs show: pack ${idArg} not found`);
+        process.exit(2);
+      }
+      console.log(JSON.stringify(pack, null, 2));
+      return;
+    }
+    console.error(`personabench packs: unknown subcommand "${sub}". Try list / create / show.`);
+    process.exit(2);
   }
 
   if (cmd === "demo") {
