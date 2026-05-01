@@ -1,0 +1,21 @@
+{
+  "id": "TASK-014",
+  "phase": "P2",
+  "title": "LocalJsonPersonaSource (BYO NDJSON/JSON adapter) + diversity sampler",
+  "status": "pending",
+  "pattern": "A",
+  "acceptance": [
+    "packages/personas/src/sources/local-json-source.ts: accepts a path to NDJSON or JSON-array of PersonaRecord-shaped rows; validates each via PersonaRecordSchema",
+    "packages/personas/src/sampling/diversity.ts: distributeBy(records, by) implements bucketed round-robin sampling across the diversityBy axes",
+    "Locale-agnostic test (proves stretch S6): a 5-row English fixture under packages/personas/fixtures/byo-en-5.ndjson loads + samples cleanly with no Korea-specific assumptions",
+    "Tests: malformed row rejected with a descriptive error; sample with diversityBy=['age', 'region'] never returns 3 same-bucket rows when 6 distinct buckets are available"
+  ],
+  "files": [
+    "packages/personas/src/sources/local-json-source.ts",
+    "packages/personas/src/sampling/diversity.ts",
+    "packages/personas/fixtures/byo-en-5.ndjson",
+    "packages/personas/src/__tests__/local-json-source.test.ts",
+    "packages/personas/src/__tests__/diversity.test.ts"
+  ],
+  "depends": ["TASK-011"]
+}

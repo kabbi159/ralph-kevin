@@ -4,6 +4,38 @@ Each iteration appends one block. Newest at the top.
 
 ---
 
+## Iteration 6 — 2026-05-01 13:57 KST — TASK-006 Phase 1 boundary (Pattern C)
+
+**Pattern:** C (phase-tester + spec-reviewer in parallel)
+
+**Sub-agents consulted (2 of 4 budget)**
+
+- `phase-tester` returned `ready=no`. Two blockers: a flaky id-collision test (3-byte suffix → 0.3% birthday-paradox collision per generator at 10k draws) and a lint-formatter violation in two `.ralph/tasks/*.json` files (depends arrays multi-line vs single-line).
+- `spec-reviewer` returned `ready=yes` from the spec perspective. Every TASK-001..005 acceptance criterion mapped to specific `file:line` cites; AGENTS.md "Done criteria for a UX finding" 11-field checklist all met; docs/06's 11 required schemas all present. Suggested adding `newArtifactId` / `newInterviewId` (already shipped) to TASK-005's acceptance — applied.
+
+**Fixes applied in this iteration (main thread)**
+
+- `packages/core/src/ids.ts`: bumped `randomBytes(3)` → `randomBytes(6)` on all five non-finding generators. Random suffix is now 48 bits → ~1.4×10⁷ samples for a 1-in-a-million collision; the 10k stress test is no longer flaky. 57/57 still green.
+- `pnpm lint --write` (which is `biome check --write .`) auto-collapsed the depends arrays. `pnpm lint:check` (no --write) now passes.
+- `.ralph/tasks/TASK-005.json` acceptance updated to list the 6 generators and 5 time helpers actually shipped.
+
+**Phase 1 closed**
+
+- All TASK-001..TASK-005 marked completed; TASK-006 (this boundary) marked completed.
+- 57 vitest assertions, 11 of 11 docs/06 schemas, all 11 friction types stable, locale-agnostic narratives.raw, 11-field UX finding contract enforceable at parse time.
+
+**Gates after fixes**
+
+- pnpm typecheck: pass (11 packages)
+- pnpm lint:check: pass (78 files, zero violations)
+- pnpm test: pass (core 57/57)
+
+**Next iteration**
+
+- TASK-010 (Phase 2 first task): NemotronNormalizer for the Korea shard, with locale-agnostic raw catch-all. Then DuckDB-backed `LocalParquetNemotronSource`, `MockPersonaSource`, `LocalJsonPersonaSource`, `PersonaCompiler`.
+
+---
+
 ## Iteration 5 — 2026-05-01 13:55 KST — TASK-005 ID generators + ISO-8601 time helpers
 
 **Pattern:** A

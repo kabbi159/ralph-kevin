@@ -1,0 +1,22 @@
+{
+  "id": "TASK-012",
+  "phase": "P2",
+  "title": "PersonaCompiler — PersonaRecord → PersonaUXProfile with promptBlock",
+  "status": "pending",
+  "pattern": "B",
+  "acceptance": [
+    "packages/personas/src/compiler/compile-persona.ts: compilePersona(record: PersonaRecord, productContext?): PersonaUXProfile",
+    "Profile includes background, six uxBehavior facets, the four taskBehaviorInstructions strings, and a rendered promptBlock",
+    "promptBlock always includes the docs/03 §Required persona system instruction verbatim",
+    "Provenance preserved via sourceProvenance (re-uses PersonaSourceSchema)",
+    "No invented demographics — the compiler must not assert facts not present in the input record (test: missing occupation in row → not 'I am a developer' in promptBlock)",
+    "Derived UX traits (digitalConfidence, decisionStyle, etc.) come from PersonaRecord.derivedTraits when set; fall back to safe defaults otherwise",
+    "Tests: round-trip a Korea-shaped record through normalizer → compiler → PersonaUXProfileSchema; promptBlock contains the required instruction; no representativeness claim language"
+  ],
+  "files": [
+    "packages/personas/src/compiler/compile-persona.ts",
+    "packages/personas/src/compiler/prompt-templates.ts",
+    "packages/personas/src/__tests__/compile-persona.test.ts"
+  ],
+  "depends": ["TASK-011"]
+}

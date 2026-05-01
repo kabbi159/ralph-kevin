@@ -1,0 +1,21 @@
+{
+  "id": "TASK-010",
+  "phase": "P2",
+  "title": "PersonaSource interface + MockPersonaSource fixture adapter",
+  "status": "pending",
+  "pattern": "A",
+  "acceptance": [
+    "packages/personas/src/sources/persona-source.ts exports PersonaSource interface (id, kind, search, sample, getById)",
+    "packages/personas/src/sources/mock-source.ts: MockPersonaSource serving >=5 fixture personas with ids prefixed `mock_`",
+    "Mock fixtures cover diverse demographics (age 20-65, mixed sex/region/occupation) so unit tests of higher layers have variety",
+    "Mock personas explicitly declare source.provider='mock' to satisfy the AGENTS.md provenance rule",
+    "Tests: search returns by textQuery substring; sample respects sampleSize; getById returns null for unknown id"
+  ],
+  "files": [
+    "packages/personas/src/sources/persona-source.ts",
+    "packages/personas/src/sources/mock-source.ts",
+    "packages/personas/src/__tests__/mock-source.test.ts",
+    "packages/personas/src/index.ts"
+  ],
+  "depends": ["TASK-006"]
+}

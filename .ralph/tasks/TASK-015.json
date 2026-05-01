@@ -1,0 +1,20 @@
+{
+  "id": "TASK-015",
+  "phase": "P2",
+  "title": "HuggingFaceNemotronSource (Python helper, deferred)",
+  "status": "pending",
+  "pattern": "A",
+  "acceptance": [
+    "packages/personas/python/hf_sample_personas.py streams from the HF API and emits NDJSON matching PersonaRecord",
+    "TS adapter packages/personas/src/sources/huggingface-source.ts spawns the python helper as a subprocess",
+    "Graceful degradation: if `python3` or `huggingface-cli` is unavailable, search/sample throw `PERSONA_SOURCE_UNAVAILABLE` so the runner falls back to LocalParquet",
+    "Tests: subprocess call + parse roundtrip works against a recorded fixture; missing python → adapter throws the documented error code"
+  ],
+  "files": [
+    "packages/personas/python/hf_sample_personas.py",
+    "packages/personas/src/sources/huggingface-source.ts",
+    "packages/personas/src/__tests__/huggingface-source.test.ts"
+  ],
+  "depends": ["TASK-011"],
+  "deferIf": "Time budget tight — LocalParquet covers offline path; HF is the network fallback."
+}

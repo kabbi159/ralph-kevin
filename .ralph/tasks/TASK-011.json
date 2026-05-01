@@ -1,0 +1,21 @@
+{
+  "id": "TASK-011",
+  "phase": "P2",
+  "title": "NemotronNormalizer (Korea-row → PersonaRecord, locale-agnostic raw catch-all)",
+  "status": "pending",
+  "pattern": "B",
+  "acceptance": [
+    "packages/personas/src/normalizers/nemotron.ts exports normalizeNemotronRow(row: Record<string, unknown>, ctx: { dataset, datasetRevision?, license? }): PersonaRecord",
+    "Maps every first-class column on PersonaRecord (locale.*, demographics.*, narratives.*) when present in the source row",
+    "Korea-specific columns (`military_status`, `bachelors_field`) and any unknown future column flow into narratives.raw without dropping",
+    "Builds an embeddingText body per docs/03 §Embedding text builder",
+    "Provenance fields (provider='nvidia', dataset, datasetRevision, rowId, license) preserved verbatim",
+    "Tests: a hand-built fixture mimicking a Korea row maps correctly; a synthetic row with unknown columns lands them under raw; a row missing optional columns parses without error"
+  ],
+  "files": [
+    "packages/personas/src/normalizers/nemotron.ts",
+    "packages/personas/src/normalizers/embedding-text.ts",
+    "packages/personas/src/__tests__/nemotron-normalizer.test.ts"
+  ],
+  "depends": ["TASK-010"]
+}

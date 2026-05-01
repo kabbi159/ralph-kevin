@@ -5,9 +5,9 @@
   "status": "completed",
   "pattern": "A",
   "acceptance": [
-    "packages/core/src/ids.ts exports newRunId(), newEventId(), newFindingId(), newSignalId() with stable, collision-resistant prefixes (run_, evt_, F-, fs_)",
-    "packages/core/src/time.ts exports nowIsoUtc(), parseIsoUtc(), isoToEpochMs(), epochMsToIso() with strict timezone handling",
-    "Tests: ids unique across 10k samples; time roundtrip preserves millisecond precision"
+    "packages/core/src/ids.ts exports newRunId(), newEventId(), newFindingId(), newSignalId(), newArtifactId(), newInterviewId() with stable, collision-resistant prefixes (run_, evt_, F-, fs_, art_, iv_)",
+    "packages/core/src/time.ts exports nowIsoUtc(), parseIsoUtc(), isoToEpochMs(), epochMsToIso(), normalizeIsoToUtc() with strict timezone handling",
+    "Tests: ids unique across 10k samples (>=48-bit random suffix); time roundtrip preserves millisecond precision"
   ],
   "files": [
     "packages/core/src/ids.ts",
@@ -15,7 +15,5 @@
     "packages/core/src/__tests__/ids.test.ts",
     "packages/core/src/__tests__/time.test.ts"
   ],
-  "depends": [
-    "TASK-001"
-  ]
+  "depends": ["TASK-001"]
 }

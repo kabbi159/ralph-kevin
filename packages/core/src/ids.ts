@@ -20,15 +20,15 @@ const sortablePrefix = (): string =>
     .toString(36)
     .padStart(9, "0");
 
-export const newRunId = (): string => `run_${sortablePrefix()}_${randomHex(3)}`;
+export const newRunId = (): string => `run_${sortablePrefix()}_${randomHex(6)}`;
 
-export const newEventId = (): string => `evt_${sortablePrefix()}_${randomHex(3)}`;
+export const newEventId = (): string => `evt_${sortablePrefix()}_${randomHex(6)}`;
 
-export const newSignalId = (): string => `fs_${sortablePrefix()}_${randomHex(3)}`;
+export const newSignalId = (): string => `fs_${sortablePrefix()}_${randomHex(6)}`;
 
-export const newArtifactId = (): string => `art_${sortablePrefix()}_${randomHex(3)}`;
+export const newArtifactId = (): string => `art_${sortablePrefix()}_${randomHex(6)}`;
 
-export const newInterviewId = (): string => `iv_${sortablePrefix()}_${randomHex(3)}`;
+export const newInterviewId = (): string => `iv_${sortablePrefix()}_${randomHex(6)}`;
 
 // Findings use a stable sequential identifier when an index is supplied
 // (matches the docs/06 example "F-001"), and a random identifier otherwise so

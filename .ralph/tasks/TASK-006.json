@@ -2,7 +2,7 @@
   "id": "TASK-006",
   "phase": "P1",
   "title": "Phase 1 boundary: phase-tester + spec-reviewer (Pattern C)",
-  "status": "pending",
+  "status": "completed",
   "pattern": "C",
   "acceptance": [
     "phase-tester runs `pnpm --filter @personabench/core test` + reports green",

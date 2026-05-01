@@ -1,0 +1,22 @@
+{
+  "id": "TASK-013",
+  "phase": "P2",
+  "title": "LocalParquetNemotronSource — DuckDB-backed source over data/personas/nemotron-korea/data/train-*.parquet",
+  "status": "pending",
+  "pattern": "B",
+  "acceptance": [
+    "packages/personas/src/sources/local-parquet-source.ts uses @duckdb/node-api 1.5.2-r.1 (NOT the legacy `duckdb` package)",
+    "Implements PersonaSource: search(query) → PersonaSearchResult, sample(config) → PersonaRecord[], getById(id) → PersonaRecord | null",
+    "search() supports every PersonaSearchQuery field: textQuery (substring), source (provider/dataset filter), locale (country/language/province/district), demographics (ageMin/ageMax + array filters), uxTraits (range tuples), sampleSize, diversityBy",
+    "sample() distributes across age × region × occupation buckets when diversityBy is set",
+    "getById() decodes a `nemotron:<dataset>:<rowId>` id back to a single row",
+    "Each result row passes through NemotronNormalizer before being returned",
+    "Tests: when the dataset cache exists, the checkout demo's persona query returns >=3 rows aged 40-65; the crack 19-19 query returns >=3 rows; queries with no matches return an empty array (not throw); the test suite skips gracefully if data/personas/nemotron-korea is absent so the gate stays green offline"
+  ],
+  "files": [
+    "packages/personas/src/sources/local-parquet-source.ts",
+    "packages/personas/src/sources/duckdb-client.ts",
+    "packages/personas/src/__tests__/local-parquet-source.test.ts"
+  ],
+  "depends": ["TASK-011"]
+}

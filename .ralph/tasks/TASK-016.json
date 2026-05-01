@@ -1,0 +1,16 @@
+{
+  "id": "TASK-016",
+  "phase": "P2",
+  "title": "Phase 2 boundary: phase-tester + spec-reviewer + dataset-validator (Pattern C)",
+  "status": "pending",
+  "pattern": "C",
+  "acceptance": [
+    "phase-tester runs `pnpm --filter @personabench/personas test` and reports green",
+    "spec-reviewer audits packages/personas against docs/03 + AGENTS.md immutables",
+    "dataset-validator verifies a sample DuckDB query against data/personas/nemotron-korea returns rows matching PersonaRecordSchema and that narratives.raw is preserving locale-specific columns",
+    "All P2 tasks (TASK-010..014) marked completed; TASK-015 may be deferred to S-queue with explicit log",
+    "Single commit with phase-complete trailer"
+  ],
+  "files": [],
+  "depends": ["TASK-010", "TASK-011", "TASK-012", "TASK-013", "TASK-014"]
+}
