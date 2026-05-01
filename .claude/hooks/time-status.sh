@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Autonomous build session time tracker
-# Window: 2026-05-01 13:00 KST – 16:30 KST
+# Window: 2026-05-01 13:30 KST – 16:30 KST
 set -uo pipefail
 
 DEADLINE_ISO="2026-05-01T16:30:00+0900"
-START_ISO="2026-05-01T13:00:00+0900"
+START_ISO="2026-05-01T13:30:00+0900"
 LOG_FILE="/Users/kevin/ralph-kevin/.claude/hooks/time-status.log"
 
 deadline_ts=$(date -j -f "%Y-%m-%dT%H:%M:%S%z" "$DEADLINE_ISO" "+%s" 2>/dev/null || echo 0)
@@ -34,7 +34,7 @@ fi
 
 if [ "$elapsed" -lt 0 ]; then
   eh=0; em=0
-  phase="아직 시작 전 (13:00 KST 시작 예정)"
+  phase="아직 시작 전 (13:30 KST 시작 예정)"
 elif [ "$elapsed" -ge "$total" ]; then
   eh=$((elapsed / 3600))
   em=$(((elapsed % 3600) / 60))
@@ -53,7 +53,7 @@ echo "[$current] remaining=${rh}h${rm_}m elapsed=${eh}h${em}m status=${status}" 
 
 context="[자동 실행 시간 추적 — 작업 단위 체크포인트]
 - 현재 시각: ${current}
-- 세션 윈도우: 2026-05-01 13:00 ~ 16:30 KST (총 3시간 30분)
+- 세션 윈도우: 2026-05-01 13:30 ~ 16:30 KST (총 3시간)
 - 경과: ${eh}시간 ${em}분 (${phase})
 - 남은 시간: ${rh}시간 ${rm_}분
 - 상태: ${status}

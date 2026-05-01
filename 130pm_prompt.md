@@ -1,11 +1,11 @@
-# 1pm Ralph Boot Prompt — PersonaBench
+# 1:30pm Ralph Boot Prompt — PersonaBench
 
-> 13:00 KST 정각, 새 Claude Code 세션에서 `/hooks` 한 번 연 뒤 아래 블록을 그대로 복붙하면 됩니다. 시간 추적 훅은 매 iteration 시작 시 active / WARNING(≤30m) / CRITICAL(≤10m) / PASSED 상태를 자동 주입합니다.
+> 13:30 KST 정각, 새 Claude Code 세션에서 `/hooks` 한 번 연 뒤 아래 블록을 그대로 복붙하면 됩니다. 시간 추적 훅은 매 iteration 시작 시 active / WARNING(≤30m) / CRITICAL(≤10m) / PASSED 상태를 자동 주입합니다.
 
 ---
 
 PersonaBench를 Ralph Mode로 자율 구현한다.
-세션 윈도우는 13:00~16:30 KST. `.claude/hooks/time-status.sh`가 매 iteration 시작 시
+세션 윈도우는 13:30~16:30 KST. `.claude/hooks/time-status.sh`가 매 iteration 시작 시
 active / WARNING / CRITICAL / PASSED 상태를 주입한다. 이 신호로 자체 페이싱하라.
 
 ## 유일한 종료 조건
