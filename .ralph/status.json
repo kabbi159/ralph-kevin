@@ -1,5 +1,5 @@
 {
-  "iteration": 18,
+  "iteration": 19,
   "currentPhase": "P3",
   "currentTaskId": "TASK-024",
   "currentTaskStatus": "completed",
@@ -8,7 +8,7 @@
   "branch": "develop",
   "lastCommitSha": "f6783219b19c1311fbac9b7952abfbf03c303eac",
   "lastPushAt": "2026-05-01T13:44:16+0900",
-  "handoffNote": "Demo path closed: G1 green (10 signals + 3 high), G2 green (post-fix → 7 resolved), G3 green (≤1s end-to-end). G4 (clone-and-install distribution) deferred — packages/cli has the bin entry but pnpm link --global setup is stretch S7.",
+  "handoffNote": "Iteration 18 added S7 CI workflow. Stretch S6/S7/S8/S9 done. Demo gates green; loop is in idle territory unless time-budget allows S2/S5/S1.",
   "gates": {
     "G1": "green",
     "G2": "green",
@@ -19,6 +19,7 @@
     "current": null,
     "completed": [
       "S6",
+      "S7",
       "S8",
       "S9"
     ]
