@@ -72,8 +72,8 @@ active / WARNING / CRITICAL / PASSED 상태를 주입한다. 이 신호로 자�
 **D. baseline 게이트.**
 `pnpm install && pnpm -r build && pnpm -r typecheck && pnpm -r lint && pnpm -r test` 전부 0 exit. 실패 시 그 iteration에서 고친 뒤 commit.
 
-**E. 첫 commit.**
-`chore(ralph): bootstrap monorepo + .ralph scaffolding`. 가이드 §12 트레일러 포함 (`Ralph-Task: TASK-000`, `Pattern: A` 등).
+**E. 첫 commit + push.**
+`chore(ralph): bootstrap monorepo + .ralph scaffolding`. 가이드 §12 트레일러 포함 (`Ralph-Task: TASK-000`, `Pattern: A` 등). commit 직후 `git push`로 `origin/develop`에 게시. push 실패 시 1회 재시도, 그래도 실패하면 다음 iteration에 catch-up. `git push --force` 절대 금지. `main`에는 절대 push 금지 (이번 빌드에서 loop가 소유하는 브랜치는 `develop` 하나뿐).
 
 ## 루프 본체
 
@@ -82,7 +82,8 @@ active / WARNING / CRITICAL / PASSED 상태를 주입한다. 이 신호로 자�
 ```
 Preflight → 다음 task 선택 → Pattern (§24.2 A/B/C/D) 결정 → 구현 → 검증
 → progress / learnings / status / spec-changes / stretch-queue 갱신
-→ §12 트레일러 단일 commit.
+→ §12 트레일러 단일 commit
+→ git push (origin/develop). 실패 시 1회 재시도, 그래도 실패하면 catch-up은 다음 iteration에서.
 ```
 
 **Pattern 규칙.**

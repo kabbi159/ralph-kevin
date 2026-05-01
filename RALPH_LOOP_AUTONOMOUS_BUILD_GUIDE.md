@@ -197,7 +197,7 @@ Use `prd.json` as the source of truth.
 ```json
 {
   "project": "PersonaBench",
-  "branchName": "feature/personabench",
+  "branchName": "develop",
   "mode": "ralph-autonomous",
   "definitionOfDone": [
     "All tasks in the queue are complete or graceful-degraded by the time-budget hook",
@@ -717,6 +717,25 @@ Next: add `pnpm exec playwright install chromium` to preflight.sh and rerun TASK
 - Do not amend a commit from a previous iteration (the previous iteration owns it).
 - Do not skip the commit when the time-budget hook hits CRITICAL — the hook explicitly says "stop new work, commit what you have."
 - Do not skip hooks (`--no-verify`, `--no-gpg-sign`, etc.). If a pre-commit hook fails, fix the underlying issue and create a NEW commit.
+
+### Remote push (mandatory after every commit)
+
+Each iteration ends with a commit **and** a push. The branch is `develop`, tracking `origin/develop` on the internal GHE remote. The full commit→push recipe:
+
+```bash
+git add <files>
+git commit -m "$(cat <<'EOF'
+<subject>
+
+<body with Ralph trailers per the table above>
+EOF
+)"
+git push   # upstream is preconfigured; push.autoSetupRemote=true handles new branches
+```
+
+If `git push` fails (network blip, transient GHE error), retry **once**, then continue the loop. The next iteration's push naturally catches up the missed commit. Do **not** `--force` push; do **not** stash and retry; do **not** open a parallel branch to "work around" the failure.
+
+Direct pushes to `main` are forbidden during this build — the autonomous loop owns `develop` only. `main` may be created later for releases, but the loop never writes to it.
 
 ---
 
